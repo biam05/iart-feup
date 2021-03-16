@@ -5,7 +5,7 @@ class GameState:
     GOAL = 3
 
     def __init__(self, matrix):
-        self.matrix = matrix
+        self.matrix = []
         self.rows = len(matrix)
         self.cols = len(matrix[0])
 
@@ -14,6 +14,7 @@ class GameState:
         self.blocks = []
 
         for i in range(self.rows):
+            row = []
             for j in range(self.cols):
                 obj = matrix[i][j]
                 if (obj == self.WALL):
