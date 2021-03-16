@@ -23,6 +23,16 @@ class GameState:
                         self.blocks.append([i, j])
                     elif (obj[0] == self.GOAL):
                         self.goals.append((i, j))
+    
+    def is_game_over(self):
+        self.goals.sort()
+        self.blocks.sort()
+
+        for i in range(len(self.goals)):
+            goal = self.goals[i]
+            block = self.blocks[i]
+            if (goal[0] != block[0] or goal[1] != block[1]):
+                return False
 
     def move(self, pos, new_pos):
         obj = self.matrix[pos[0]][pos[1]]
