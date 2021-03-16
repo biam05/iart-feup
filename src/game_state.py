@@ -34,11 +34,18 @@ class GameState:
         for i in range(len(self.blocks)):
             block = self.blocks[i]
             walls = sorted(filter(lambda el: el[0] == block[0] and el[1] < block[1], self.walls + self.blocks[:i]), key=lambda el: -el[1])
-            print(walls)
             new_col = walls[0][1] + 1 if walls else 0
-            print(new_col)
             self.move(block, (block[0], new_col))
             self.blocks[i][1] = new_col
+
+    def swipe_up(self):
+        self.blocks.sort(key=lambda el: el[0])
+        for i in range(len(self.blocks)):
+            block = self.blocks[i]
+            walls = sorted(filter(lambda el: el[1] == block[1] and el[0] < block[0], self.walls + self.blocks[:i]), key=lambda el: -el[0])
+            new_row = walls[0][0] + 1 if walls else 0
+            self.move(block, (new_row, block[1]))
+            self.blocks[i][0] = new_row
 
     def __repr__(self):
         out = "["

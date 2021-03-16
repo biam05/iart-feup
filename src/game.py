@@ -16,7 +16,7 @@ game_state = GameState(test_state)
 
 print(game_state)
 
-game_state.swipe_left()
+game_state.swipe_up()
 
 print(game_state)
 
