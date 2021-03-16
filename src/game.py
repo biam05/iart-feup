@@ -7,7 +7,7 @@ WINDOW_HEIGHT = 720
 
 test_state = [
     [1, 1, 0, 1],
-    [0, 1, 0, [2, "purple"]],
+    [0, 1, [2, "purple"], 0],
     [[3, "purple"], 1, [2, "purple"], 1],
     [0, 0, 0, [3, "purple"]]
 ]
@@ -16,7 +16,7 @@ game_state = GameState(test_state)
 
 print(game_state)
 
-game_state.swipe_up()
+game_state.swipe_down()
 
 print(game_state)
 
