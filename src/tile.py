@@ -1,8 +1,8 @@
 class Tile:
-    def __init__(self, row, col, is_wall):
+    def __init__(self, row, col):
         self.row = row
         self.col = col
-        self.is_wall = is_wall
+        self.is_wall = False
         self.block = ""
         self.goal = ""
 
@@ -20,7 +20,20 @@ class Tile:
         out += "]"
         return out
 
-    def is_wall(self):
+    def set_wall(self):
+        self.is_wall = True
+    
+    def set_empty(self):
+        self.block = ""
+        self.goal = ""
+
+    def set_block(self, color):
+        self.block = color
+    
+    def set_goal(self, color):
+        self.goal = color
+
+    def is_tile_wall(self):
         return self.is_wall
 
     def is_empty(self):
@@ -31,6 +44,9 @@ class Tile:
     
     def has_goal(self):
         return self.goal != ""
+
+    def get_block(self):
+        return self.block
 
     def block_matches_goal(self):
         return not self.is_empty and (self.block == self.goal)

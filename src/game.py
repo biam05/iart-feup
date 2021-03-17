@@ -12,7 +12,11 @@ test_state = [
     [0, 0, 0, [3, "purple"]]
 ]
 
-game_state = GameState(test_state)
+walls = [ [0, 0], [0, 1], [0, 3], [1, 1], [2, 1], [2, 3] ]
+blocks = [ [1, 2, "purple"], [2, 2, "purple"] ]
+goals = [ [2, 0, "purple"], [3, 3, "purple"] ]
+
+game_state = GameState(4, 4, walls, blocks, goals)
 
 print(game_state)
 

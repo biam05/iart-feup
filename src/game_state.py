@@ -1,44 +1,50 @@
+from tile import Tile
+
 class GameState:
-    EMPTY = 0
-    WALL = 1
-    BLOCK = 2
-    GOAL = 3
-
-    def __init__(self, matrix):
+    def __init__(self, rows, cols, walls, blocks, goals):
         self.matrix = []
-        self.rows = len(matrix)
-        self.cols = len(matrix[0])
-
-        self.walls = []
-        self.goals = []
-        self.blocks = []
+        
+        self.walls = walls
+        self.blocks = blocks
+        self.goals = goals
+        
+        self.rows = rows
+        self.cols = cols
 
         for i in range(self.rows):
             row = []
             for j in range(self.cols):
-                obj = matrix[i][j]
-                if (obj == self.WALL):
-                    self.walls.append((i, j))
-                elif (isinstance(obj, list)):
-                    if (obj[0] == self.BLOCK):
-                        self.blocks.append([i, j])
-                    elif (obj[0] == self.GOAL):
-                        self.goals.append((i, j))
+                row.append(Tile(i, j))
+            self.matrix.append(row)
+
+        for wall in self.walls:
+            row = wall[0]
+            col = wall[1]
+            self.matrix[row][col].set_wall()
+
+        for block in self.blocks:
+            row = block[0]
+            col = block[1]
+            color = block[2]
+            self.matrix[row][col].set_block(color)
+
+        for goal in self.goals:
+            row = goal[0]
+            col = goal[1]
+            color = goal[2]
+            self.matrix[row][col].set_goal(color)
     
     def is_game_over(self):
-        self.goals.sort()
-        self.blocks.sort()
-
-        for i in range(len(self.goals)):
-            goal = self.goals[i]
-            block = self.blocks[i]
-            if (goal[0] != block[0] or goal[1] != block[1]):
+        for goal in self.goals:
+            tile = self.matrix[goal[0]][goal[1]]
+            if (not tile.block_matches_goal):
                 return False
+        return True
 
     def move(self, pos, new_pos):
-        obj = self.matrix[pos[0]][pos[1]]
-        self.matrix[pos[0]][pos[1]] = self.EMPTY
-        self.matrix[new_pos[0]][new_pos[1]] = obj 
+        obj = self.matrix[pos[0]][pos[1]].block
+        self.matrix[pos[0]][pos[1]].set_block("")
+        self.matrix[new_pos[0]][new_pos[1]].set_block(obj) 
 
     def swipe_left(self):
         self.blocks.sort(key=lambda el: el[1])
@@ -82,15 +88,18 @@ class GameState:
             out += "\n["
             for j in range(self.cols):
                 obj = self.matrix[i][j]
-                if (obj == self.EMPTY):
-                    out += " EMPTY\t\t"
-                if (obj == self.WALL):
-                    out += " WALL\t\t"
-                elif (isinstance(obj, list)):
-                    if (obj[0] == self.BLOCK):
-                        out += f" BLOCK[{obj[1]}]\t\t"
-                    elif (obj[0] == self.GOAL):
-                        out += f" GOAL[{obj[1]}]\t\t"
-            out += "\t]"
+                if (obj.is_empty()):
+                    out += "%30s" % "EMPTY"
+                elif (obj.is_tile_wall()):
+                    out += "%30s" % "WALL"
+                else:
+                    temp = "["
+                    if obj.has_block():
+                        temp += f"BLOCK[{obj.block} "
+                    if obj.has_goal():
+                        temp += f"GOAL[{obj.goal}]"
+                    temp += "]"
+                    out += "%30s" % temp
+            out += "]"
         out += "\n]\n"
         return out
