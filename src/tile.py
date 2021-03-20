@@ -50,3 +50,14 @@ class Tile:
 
     def block_matches_goal(self):
         return not self.is_empty and (self.block == self.goal)
+
+    def __eq__(self, other):
+        if self.is_wall and other.is_wall:
+            return True
+        
+        if self.is_empty() and other.is_empty():
+            return True
+        
+        if self.goal == other.goal and self.block == other.block:
+            return True
+        return False

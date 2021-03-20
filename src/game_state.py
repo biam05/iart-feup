@@ -103,3 +103,7 @@ class GameState:
             out += "]"
         out += "\n]\n"
         return out
+
+    def __eq__(self, other):
+        return self.matrix == other.matrix
+
