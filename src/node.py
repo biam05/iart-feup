@@ -1,6 +1,6 @@
 class Node:
     def __init__(blocks):
-        self.blocks = block
+        self.blocks = blocks
 
     def move(self, pos, new_pos):
         obj = self.matrix[pos[0]][pos[1]].block

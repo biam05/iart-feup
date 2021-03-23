@@ -1,3 +1,4 @@
+from node import Node
 class Graph:
     def __init__(walls, goals, gamestate): # gamestate -> node
         self.walls = walls
@@ -21,5 +22,5 @@ class Graph:
         if n_correct_goals == n_goals:
             return True
         return False
-    
+
     
