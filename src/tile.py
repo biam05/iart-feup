@@ -21,7 +21,7 @@ class Tile:
         return out
 
     def set_wall(self):
-        self.is_wall = True
+        self.is_walel = True
     
     def set_empty(self):
         self.block = ""
