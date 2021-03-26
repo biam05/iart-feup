@@ -1,17 +1,9 @@
-from tile import Tile
+from match_the_tiles.model.tile_data import WallData, BlockData, GoalData
+from utils.utils import Coords
+
 from enum import Enum
 from copy import deepcopy
 import sys
-
-"""
-Checks if point t is in between p1 and p2
-"""
-def in_between(p1, p2, t):
-    if (p1[0] == p2[0] and p1[0] == t[0]):
-        return (t[1] > p1[1] and t[1] < p2[1]) or (t[1] < p1[1] and t[1] > p2[1])
-    elif (p1[1] == p2[1] and p1[1] == t[1]):
-        return (t[0] > p1[0] and t[0] < p2[0]) or (t[0] < p1[0] and t[0] > p2[0])
-    return False
 
 class Move(Enum):
     SWIPE_LEFT = 0
@@ -19,20 +11,59 @@ class Move(Enum):
     SWIPE_RIGHT = 2
     SWIPE_UP = 3
 
+class CommonGameState:
+    """
+    Constructor
+    - List walls : List of coordinates of the walls (i.e. [x, y])
+    - List goals : List of coordinates and colors of the goals (i.e. [x, y, color])
+    - Int rows : Number of rows in the game board
+    - Int cols : Number of cols in the game board
+    """
+    def __init__(self, walls : list, goals : list, rows : int, cols : int):
+        self.walls = list()
+        for wall in walls:
+            self.walls.append(WallData(Coords(wall[0], wall[1])))
+
+        self.goals = list()
+        for goal in goals:
+            self.goals.append(GoalData(Coords(goal[0], goal[1]), goal[2]))
+
+        self.rows = rows
+        self.cols = cols
 
 class GameState:
     """
     Constructor
-    - List[List] blocks     : list of coordinates of all movable blocks
-    - Move move             : Move that generated the game state
-    - Int nMoves            : Number of moves since starting GameState
+    - CommonGameState common_gs : GameState containing the non-movable tiles
+    - List blocks : List of coordinates and colors of the blocks (i.e. [x, y, color])
+    - Move move : Move that originated GameState, None if initial
+    - Int nMoves : Number of moves since initial state
     """
-    def __init__(self, blocks, move=None, nMoves = 0):
-        self.blocks = blocks
+    def __init__(self, common_gs, blocks, move=None, nMoves=0):
+        self.common_gs = common_gs
+        self.blocks = list()
+        for block in blocks:
+            self.blocks.append(BlockData(Coords(block[0], block[1]), block[2]))
         self.move = move
         self.nMoves = nMoves
         self.points = -1
+
+    """
+    Makes a copy of the list of blocks
+    """
+    def make_blocks_copy(self):
+        copy_blocks = list()
+        for block in self.blocks:
+            copy_blocks.append(BlockData(Coords(block.coords.x, block.coords.y), block.color))
+
+        return copy_blocks
     
+    """
+    Evaluates GameState value
+    - Tile[][] matrix : Game board containing the tiles
+    - Coords[] goals : List containing the coordinates of the goals
+    - Coords[] walls : List containing the coordinates of the walls
+    """
     def eval_game_state(self, matrix, goals, walls):
         if (self.points == -1):
             for goal in goals:
@@ -64,6 +95,14 @@ class GameState:
 
         return self.nMoves + self.points # evaluate based on current state
 
+    """
+    Checks if there's a wall adjacent to the goal on the direction the block is moving
+    - Coords block : Coordinates of the block
+    - Coords goal : Coordinates of the goal
+    - Coords wall : Coordinates of the wall
+    Returns if the wall is adjacent to the goal in the direction the block would be moving, thus stopping the block in the goal
+    """
+    @staticmethod
     def is_wall_stopping_block_at_goal(block, goal, wall):
         if goal[0] == block[0]:
             if (goal[1] > wall[1] and wall[1] == goal[1] + 1) or (goal[1] < wall[1] and wall[1] == goal[1] - 1):
@@ -74,6 +113,15 @@ class GameState:
                 return True
         return False
 
+    """
+    Estimates the number of moves needed to finish the game from a GameState
+    - Coords[] goals : List of coordinates of the goals
+    - Coords[] walls : List of coordinates of the walls
+    - Int rows : Number of rows on the game board
+    - Int cols : Number of columns on the game board
+
+    Returns the estimate number of moves needed to finish the game 
+    """
     def estimate_moves_left(self, goals, walls, rows, cols):
         moves = 0
 
@@ -90,10 +138,10 @@ class GameState:
                     if goal_x == block_x and goal_y == block_y:
                         local_moves = min(local_moves, 0)
                         break
-                    obstacles = filter(lambda el: el != block and in_between(goal, block, el)), self.blocks + walls)
+                    obstacles = filter(lambda el: el != block and in_between(goal, block, el), self.blocks + walls)
                     # has an obstacle between the block and the goal
                     if obstacles:
-                        local_moves = min(local_moves, 4)
+                        local_moves = min(local_moves, 3)
                     else:
                         if (goal_x == block_x and (goal_y == 0 or goal_y == cols - 1)) or (goal_y == block_y and (goal_x == 0 or goal_x == rows - 1)):
                             local_moves = min(local_moves, 1)
@@ -107,50 +155,64 @@ class GameState:
                     # horizontal move
 
                     # vertical move
-                    colinear_walls_with_move = filter(lambda el: el[1] == block_y and ((el[0] <= goal_x - 1 and goal_x < block_x) or (el[0] >= goal_x + 1 and goal_x > block_x))
+                    colinear_walls_with_move = filter(lambda el: el[1] == block_y and ((el[0] <= goal_x - 1 and goal_x < block_x) or (el[0] >= goal_x + 1 and goal_x > block_x)))
                     closest_wall = min(, key=lambda el: abs(el[0] - block_x))
 
+    """
+    Swipe Left Operation - Moves the movable blocks in the GameState to the left
 
-    def swipe_left(self, walls):
-        new_blocks = deepcopy(self.blocks)
-        new_blocks.sort(key=lambda el: el[1])
+    Returns the new GameState generated by that operation
+    """
+    def swipe_left(self):
+        new_blocks = self.make_blocks_copy()
+        new_blocks.sort(key=lambda el: el.coords.y)
         for i in range(len(self.blocks)):
             block = new_blocks[i]
-            walls = sorted(filter(lambda el: el[0] == block[0] and el[1] < block[1], self.walls + self.blocks[:i]), key=lambda el: -el[1])
-            new_col = walls[0][1] + 1 if walls else 0
-            new_blocks[i][1] = new_col
+            walls = sorted(filter(lambda el: el.coords.x == block.coords.x and el.coords.y < block.coords.y, self.blocks[:i] + self.common_gs.walls), key=lambda el: -el.coords.y)
+            new_col = walls[0].coords.y + 1 if walls else 0
+            new_blocks[i].coords.setY(new_col)
         
-        return GameState(new_blocks, Move.SWIPE_LEFT, self.nMoves)
+        return GameState(self.common_gs, new_blocks, move=Move.SWIPE_LEFT, nMoves=(self.nMoves + 1))
 
+    """
+    Swipe Right Operation - Moves the movable blocks in the GameState to the right
+
+    Returns the new GameState generated by that operation
+    """
+    def swipe_right(self):
+        new_blocks = self.make_blocks_copy()
+        new_blocks.sort(key=lambda el: -el.coords.y)
+        for i in range(len(self.blocks)):
+            block = new_blocks[i]
+            walls = sorted(filter(lambda el: el.coords.x == block.coords.x and el.coords.y > block.coords.y, self.blocks[:i] + self.common_gs.walls), key=lambda el: el.cords.y)
+            new_col = walls[0].coords.y - 1 if walls else (self.common_gs.cols - 1)
+            new_blocks[i].coords.setY(new_col)
+        
+        return GameState(self.common_gs, new_blocks, move=Move.SWIPE_RIGHT, nMoves=(self.nMoves + 1))
+
+    """
+    Swipe Down Operation - Moves the movable blocks in the GameState downwards
+
+    Returns the new GameState generated by that operation
+    """
+    def swipe_down(self):
+        new_blocks = self.make_blocks_copy()
+        new_blocks.sort(key=lambda el: -el.coords.x)
+        for i in range(len(self.blocks)):
+            block = new_blocks[i]
+            walls = sorted(filter(lambda el: el.coords.y == block.coords.y and el.coords.x > block.coords.x, self.blocks[:i] + self.common_gs.walls), key=lambda el: el.coords.x)
+            new_row = walls[0].coords.x - 1 if walls else (self.common_gs.rows - 1)
+            new_blocks[i].coords.setX(new_row)
+        
+        return GameState(self.common_gs, new_blocks, move=Move.SWIPE_DOWN, nMoves=(self.nMoves + 1))
+
+"""
     def is_game_over(self):
         for goal in self.goals:
             tile = self.matrix[goal[0]][goal[1]]
             if (not tile.block_matches_goal):
                 return False
         return True
-
-    def move(self, pos, new_pos):
-        obj = self.matrix[pos[0]][pos[1]].block
-        self.matrix[pos[0]][pos[1]].set_block("")
-        self.matrix[new_pos[0]][new_pos[1]].set_block(obj) 
-
-    def swipe_left(self):
-        self.blocks.sort(key=lambda el: el[1])
-        for i in range(len(self.blocks)):
-            block = self.blocks[i]
-            walls = sorted(filter(lambda el: el[0] == block[0] and el[1] < block[1], self.walls + self.blocks[:i]), key=lambda el: -el[1])
-            new_col = walls[0][1] + 1 if walls else 0
-            self.move(block, (block[0], new_col))
-            self.blocks[i][1] = new_col
-
-    def swipe_right(self):
-        self.blocks.sort(key=lambda el: -el[1])
-        for i in range(len(self.blocks)):
-            block = self.blocks[i]
-            walls = sorted(filter(lambda el: el[0] == block[0] and el[1] > block[1], self.walls + self.blocks[:i]), key=lambda el: el[1])
-            new_col = walls[0][1] - 1 if walls else (self.cols - 1)
-            self.move(block, (block[0], new_col))
-            self.blocks[i][1] = new_col
 
     def swipe_up(self):
         self.blocks.sort(key=lambda el: el[0])
@@ -195,3 +257,4 @@ class GameState:
     def __eq__(self, other):
         return self.matrix == other.matrix
 
+"""

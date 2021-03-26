@@ -12,11 +12,20 @@ class Node:
         self.parent = parent
         self.edge = edge
         self.use_heuristic = use_heuristic
+    
+    """
+    Less than operator
+    - Node other : Other node
+    
+    Returns true if node on the left is lesser than the node on the right
+    """
+    def __lt__(self, other):
+        return self.eval_node() < other.eval_node()
 
-    def move(self, pos, new_pos):
-        obj = self.matrix[pos[0]][pos[1]].block
-        self.matrix[pos[0]][pos[1]].set_block("")
-        self.matrix[new_pos[0]][new_pos[1]].set_block(obj) 
+    """
+    Evaluates the value of the node based on the GameState
 
+    Returns the value of the node
+    """
     def eval_node(self):
         return self.game_state.cost
