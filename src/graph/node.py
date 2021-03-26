@@ -3,14 +3,12 @@ class Node:
     Constructor
     - GameState game_state  : current game_state
     - Node parent           : parent node
-    - Node edge             : operation used to obtain current state from parent 
     - Boolean use_heuristic : use heuristics to estimate cost left
 
     """
-    def __init__(self, game_state, parent=None, edge=None, use_heuristic=False):
+    def __init__(self, game_state, parent=None, use_heuristic=False):
         self.game_state = game_state
         self.parent = parent
-        self.edge = edge
         self.use_heuristic = use_heuristic
     
     """
