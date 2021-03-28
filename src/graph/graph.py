@@ -1,7 +1,7 @@
 from graph.node import Node
 from collections import defaultdict
 from copy import deepcopy
-import queue
+from queue import PriorityQueue
 
 class Graph:
     """
@@ -16,8 +16,8 @@ class Graph:
     - Node source   : parent node
     - Node dest     : child node
     """
-    def add_edge(self, source, dest):
-        node = Node(dest, parent=source)
+    def add_edge(self, source, dest, heuristics=False):
+        node = Node(dest, parent=source, use_heuristic=heuristics)
         self.graph[source].append(node)
         return node
     
@@ -34,7 +34,7 @@ class Graph:
     - GameState start : startinga GameState
     - Function algorithm : Function that decides which node to expand next
     """
-    def blind_search(self, start, algorithm):
+    def __blind_search(self, start, algorithm):
         visited = defaultdict(bool)
 
         start_node = Node(start)
@@ -62,44 +62,40 @@ class Graph:
         queue.append(node)
         visited[node.game_state] = True
 
+    def bfs(self, start):
+        return self.__blind_search(start, self.__bfs)
 
     """
     Performs a directed search using the algorithm specified
     - GameState start : startinga GameState
     - Function algorithm : Function that decides which node to expand next
     """
-    def directed_search(self, start, algorithm):
+    def __directed_search(self, start, heuristics=False):
+        visited = defaultdict(bool)
+
+        queue = PriorityQueue()
+        queue.put(Node(start, use_heuristic=heuristics))
+
+        visited[start] = True
+
+        while queue:
+            current = queue.get()
+
+            if current.game_state.is_game_over():
+                return current
+
+            for edge in self.get_edges(current):
+                node = self.add_edge(current.game_state, edge, heuristics=heuristics)
+
+                if visited[node.game_state]:
+                    continue
+                queue.put(node)
+                visited[node.game_state] = True
 
         return None
-
-"""
-    def bfs(self, node):
-        visited = []
-        queue = []
-        visited.append(node)
-        queue.append(node)
-        while queue:
-            s = queue.pop(0)
-            if self.is_game_over(self, s):
-                return s
-            neighbours = self.get_neighbours(self, node)[s]
-            for neighbour in neighbours:
-                if neighbour not in visited:
-                    visited.append(neighbour)
-                    queue.append(neighbour)
-
-    def ucs(self, node):
-        visited = set()
-        q = queue.ProrityQueue()
-        q.put((0,node,[node]))
-        while not q.empty():
-            cost, current_node, path = q.get()
-            visited.add(current_node)
-            if self.is_game_over(self, current_node):
-                return path
-            else:
-                neighbours = self.get_neighbours(self, node)[current_node]
-                for neighbour in neighbours:
-                    if neighbour not in visited:
-                        q.put((cost, neighbour))
     
+    def uniform_cost_search(self, start):
+        return self.__directed_search(start, heuristics=False)
+
+    def a_star(self, start):
+        return self.__directed_search(start, heuristics=True)
