@@ -3,6 +3,7 @@ from match_the_tiles.logic.game_state import GameState, CommonGameState
 def get_level(level_no):
     file_name = "levels/" + level_no
     game_state = read_file(file_name)
+    return game_state
 
 def read_file(file_name):
 

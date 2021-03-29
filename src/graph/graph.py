@@ -10,6 +10,7 @@ class Graph:
     """
     def __init__(self, gamestate):
         self.graph = defaultdict(list)
+        self.initial = gamestate
 
     """
     Adds edge from the source node to dest node
