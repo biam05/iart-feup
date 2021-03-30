@@ -16,6 +16,10 @@ class BlockData:
     """
     def move(self, new_coords : Coords):
         self.coords = new_coords
+    
+    def __repr__(self):
+        return f"BLOCK[{self.coords.x}, {self.coords.y}, {self.color}]"
+    
 
 class GoalData:
     """
@@ -34,6 +38,9 @@ class GoalData:
     def match_block(self, block):
         return (self.coords == block.coords) and (self.color == block.color)
 
+    def __repr__(self):
+        return f"GOAL[{self.coords.x}, {self.coords.y}, {self.color}]"
+
 class WallData:
     """
     Constructor
@@ -42,3 +49,6 @@ class WallData:
     """
     def __init__(self, coords : Coords):
         self.coords = coords
+    
+    def __repr__(self):
+        return f"WALL[{self.coords.x}, {self.coords.y}]"

@@ -10,6 +10,8 @@ class Graph:
     """
     def __init__(self, gamestate):
         self.graph = defaultdict(list)
+        self.nodes = defaultdict(Node)
+        self.nodes.default_factory = lambda: None
         self.initial = gamestate
 
     """
@@ -18,7 +20,10 @@ class Graph:
     - Node dest     : child node
     """
     def add_edge(self, source, dest, heuristics=False):
-        node = Node(dest, parent=source, use_heuristic=heuristics)
+        node = self.nodes[dest]
+        if not self.nodes[dest]:
+            node = Node(dest, parent=source, use_heuristic=heuristics)
+            self.nodes[dest] = node
         self.graph[source].append(node)
         return node
     
@@ -100,3 +105,18 @@ class Graph:
 
     def a_star(self, start):
         return self.__directed_search(start, heuristics=True)
+
+    def rebuild_path(self, node):
+        path = list()
+        if (node.game_state.move):
+            path.append(node.game_state.move)
+        parent_gs = node.parent
+        parent_node = self.nodes[parent_gs]
+
+        while parent_node:
+            if (parent_node.game_state.move):
+                path.append(parent_node.game_state.move)
+            parent_gs = parent_node.parent
+            parent_node = self.nodes[parent_gs]
+        path.reverse()
+        return path

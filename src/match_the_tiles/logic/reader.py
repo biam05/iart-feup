@@ -1,7 +1,8 @@
 from match_the_tiles.logic.game_state import GameState, CommonGameState
 
-def get_level(level_no):
-    file_name = "levels/" + level_no
+def get_level(level_no, advanced=False):
+    sub_dir = "advanced" if advanced else "normal"
+    file_name = f"levels/{sub_dir}/{level_no}"
     game_state = read_file(file_name)
     return game_state
 
@@ -11,8 +12,8 @@ def read_file(file_name):
 
     lines = file.readlines()
 
-    rows = lines.len()
-    cols = lines[0].len()
+    rows = len(lines)
+    cols = len(lines[0])
     walls = []
     goals = []
     blocks = []
