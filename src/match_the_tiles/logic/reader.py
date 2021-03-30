@@ -11,14 +11,15 @@ def read_file(file_name):
 
     lines = file.readlines()
 
-    x = 0
-    y = 0
     rows = lines.len()
     cols = lines[0].len()
     walls = []
     goals = []
     blocks = []
+    
+    x = 0
     for line in lines:
+        y = 0
         for char in line:
             if char == '#':
                 walls.append([x, y])
@@ -29,7 +30,6 @@ def read_file(file_name):
                     blocks.append([x, y, char])                
             y += 1
         x += 1
-        y = 0
 
     commonGameState = CommonGameState(walls, goals, rows, cols)
     return GameState(commonGameState, blocks)
