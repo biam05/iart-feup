@@ -48,12 +48,12 @@ class Graph:
 
         visited[start] = True
 
-        file = open("debug.txt", 'w+')
+        # file = open("debug.txt", 'w+')
 
         while queue:
             current = queue.pop(0)
 
-            file.write(f"Depth Level {current.game_state.nMoves}: {current.game_state.blocks} - Originated from {current.game_state.move} - Parent Gamestate {current.parent.blocks if current.parent else 'Initial'}\n")
+            # file.write(f"Depth Level {current.game_state.nMoves}: {current.game_state.blocks} - Originated from {current.game_state.move} - Parent Gamestate {current.parent.blocks if current.parent else 'Initial'}\n")
 
             if current.game_state.is_game_over():
                 return current

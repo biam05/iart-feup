@@ -13,11 +13,10 @@ def read_file(file_name):
     lines = file.readlines()
 
     rows = len(lines)
-    cols = len(lines[0])
+    cols = len(lines[0]) - 1
     walls = []
     goals = []
     blocks = []
-    
     x = 0
     for line in lines:
         y = 0
