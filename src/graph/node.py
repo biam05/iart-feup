@@ -26,4 +26,4 @@ class Node:
 
         Returns the value of the node
         """
-        return self.game_state.eval_game_state()
+        return self.game_state.eval_game_state() #+ self.game_state.

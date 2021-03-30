@@ -71,6 +71,7 @@ class GameState:
     """
     def eval_game_state(self):
         if (self.points == -1):
+            self.points = 0
             for goal in self.common_gs.goals:
                 goal_x = goal.coords.x
                 goal_y = goal.coords.y
@@ -87,7 +88,7 @@ class GameState:
                             self.points += 2
                             for obstacle in obstacles:
                                 # wall between goal and block
-                                if obstacle[0] == goal_x and ((obstacle.coords.x > goal_x and obstacle.coords.x < block_x)or(obstacle.coords-x < goal_x and obstacle.coords.x > block_x)): 
+                                if obstacle[0] == goal_x and ((obstacle.coords.x > goal_x and obstacle.coords.x < block_x)or(obstacle.coords.x < goal_x and obstacle.coords.x > block_x)): 
                                     self.points += 2
                                     break
                         elif goal_y == block_y and goal_x != block_x: # same column but different row
@@ -97,6 +98,8 @@ class GameState:
                                 if obstacle.coords.y == goal_y and ((obstacle.coords.y > goal_y and obstacle.coords.y < block_y)or(obstacle.coords.y < goal_y and obstacle.coords.y > block_y)): 
                                     self.points += 2 
                                     break
+                        else:
+                            self.points+=4
 
         return self.nMoves + self.points # evaluate based on current state
 
@@ -127,7 +130,7 @@ class GameState:
 
     Returns the estimate number of moves needed to finish the game 
     """
-    def estimate_moves_left(self, goals, walls, rows, cols):
+    def estimate_moves_left(self):
         moves = 0
 
         for block in self.blocks:
