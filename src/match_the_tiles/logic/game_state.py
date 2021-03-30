@@ -60,21 +60,18 @@ class GameState:
     
     """
     Evaluates GameState value
-    - Tile[][] matrix : Game board containing the tiles
-    - Coords[] goals : List containing the coordinates of the goals
-    - Coords[] walls : List containing the coordinates of the walls
     """
-    def eval_game_state(self, matrix, goals, walls):
+    def eval_game_state(self):
         if (self.points == -1):
-            for goal in goals:
-                goal_x = goal[0]
-                goal_y = goal[1]
-                goal_color = goal[2]
+            for goal in self.common_gs.goals:
+                goal_x = goal.coords.x
+                goal_y = goal.coords.y
+                goal_color = goal.color
                 for block in self.blocks:
                     obstacles = filter(lambda el: el != block, self.blocks + walls)
-                    block_x = block[0]
-                    block_y = block[1]
-                    block_color = block[2]
+                    block_x = block.coords.x
+                    block_y = block.coords.y
+                    block_color = block.color
                     if goal_color == block_color:
                         if goal_x == block_x and goal_y == block_y: # block matches goal
                             self.points += 1
@@ -82,14 +79,14 @@ class GameState:
                             self.points += 2
                             for obstacle in obstacles:
                                 # wall between goal and block
-                                if obstacle[0] == goal_x and ((obstacle[0] > goal_x and obstacle[0] < block_x)or(obstacle[0] < goal_x and obstacle[0] > block_x)): 
+                                if obstacle[0] == goal_x and ((obstacle.coords.x > goal_x and obstacle.coords.x < block_x)or(obstacle.coords-x < goal_x and obstacle.coords.x > block_x)): 
                                     self.points += 2
                                     break
                         elif goal_y == block_y and goal_x != block_x: # same column but different row
                             self.points += 2 
                             for obstacle in obstacles:
                                 # wall between goal and block
-                                if obstacle[1] == goal_y and ((obstacle[1] > goal_y and obstacle[1] < block_y)or(obstacle[1] < goal_y and obstacle[1] > block_y)): 
+                                if obstacle.coords.y == goal_y and ((obstacle.coords.y > goal_y and obstacle.coords.y < block_y)or(obstacle.coords.y < goal_y and obstacle.coords.y > block_y)): 
                                     self.points += 2 
                                     break
 
@@ -104,12 +101,12 @@ class GameState:
     """
     @staticmethod
     def is_wall_stopping_block_at_goal(block, goal, wall):
-        if goal[0] == block[0]:
-            if (goal[1] > wall[1] and wall[1] == goal[1] + 1) or (goal[1] < wall[1] and wall[1] == goal[1] - 1):
+        if goal.coords.x == block.coords.x:
+            if (goal.coords.y > wall.coords.y and wall.coords.y == goal.coords.y + 1) or (goal.coords.y < wall.coords.y and wall.coords.y == goal.coords.y - 1):
                 return True
             
-        elif goal[1] == block[1]:
-            if (goal[0] > block[0] and goal[0] + 1 == wall[0]) or (goal[0] < block[0] and goal[0] - 1 == wall[0]):
+        elif goal.coords.y == block.coords.y:
+            if (goal.coords.x > block.coords.x and goal.coords.x + 1 == wall.coords.x) or (goal.coords.x < block.coords.x and goal.coords.x - 1 == wall.coords.x):
                 return True
         return False
 
@@ -127,14 +124,14 @@ class GameState:
 
         for block in self.blocks:
             local_moves = sys.maxint
-            block_x = block[0]
-            block_y = block[1]
-            colinear_goals = filter(lambda el: el[2] == block[2] and (el[0] == block[0] or el[1] == block[1]), goals)
+            block_x = block.coords.x
+            block_y = block.coords.y
+            colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), goals)
             # colinear
             if (colinear_goals):
                 for goal in colinear_goals:
-                    goal_x = goal[0]
-                    goal_y = goal[1]
+                    goal_x = goal.coords.x
+                    goal_y = goal.coords.y
                     if goal_x == block_x and goal_y == block_y:
                         local_moves = min(local_moves, 0)
                         break
@@ -150,7 +147,7 @@ class GameState:
                             local_moves = min(local_moves, 1 if obstacles else 2)
             # non-colinear
             else:
-                matching_goals = filter(lambda el: el[2] == block[2], goals)
+                matching_goals = filter(lambda el: el.color == block.color, goals)
                 for goal in matching_goals:
                     # horizontal move
 
