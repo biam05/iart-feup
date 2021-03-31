@@ -50,28 +50,41 @@ class GameState:
     
     def __repr__(self):
         out = ""
-        for i in range(self.common_gs.rows):
+        matrix = self.getGameStateMatrix()
+        for i in matrix:
             out += "\n"
+            for j in i:
+                out += j + "\t"
+        out += "\n"
+        return out
+
+    """
+    Makes A Matrix with the board
+    """
+    def getGameStateMatrix(self):
+        matrix = []
+        for i in range(self.common_gs.rows):
+            line = []
             for j in range(self.common_gs.cols):
                 coord = Coords(i, j)
                 tipo = "."
                 for block in self.blocks:
-                    if coord == block.coords: 
+                    if coord == block.coords:
                         tipo = block.color
                         break
                 for goal in self.common_gs.goals:
                     if tipo != ".": break
-                    if coord == goal.coords: 
+                    if coord == goal.coords:
                         tipo = goal.color
                         break
                 for wall in self.common_gs.walls:
                     if tipo != ".": break
-                    if coord == wall.coords: 
+                    if coord == wall.coords:
                         tipo = "#"
                         break
-                out += tipo + "\t"               
-        out += "\n"
-        return out
+                line.append(tipo)
+            matrix.append(line)
+        return matrix
 
     """
     Makes a copy of the list of blocks
