@@ -13,14 +13,14 @@ class Move(Enum):
     SWIPE_UP = 3
 
 class CommonGameState:
-    """
-    Constructor
-    - List walls : List of coordinates of the walls (i.e. [x, y])
-    - List goals : List of coordinates and colors of the goals (i.e. [x, y, color])
-    - Int rows : Number of rows in the game board
-    - Int cols : Number of cols in the game board
-    """
     def __init__(self, walls : list, goals : list, rows : int, cols : int):
+        """
+        Constructor
+        - List walls : List of coordinates of the walls (i.e. [x, y])
+        - List goals : List of coordinates and colors of the goals (i.e. [x, y, color])
+        - Int rows : Number of rows in the game board
+        - Int cols : Number of cols in the game board
+        """
         self.walls = list()
         for wall in walls:
             self.walls.append(WallData(Coords(wall[0], wall[1])))
