@@ -1,10 +1,8 @@
 import pygame
 import sys
 from pygame.locals import *
-from match_the_tiles.logic.reader import get_level, read_file
-from graph.graph import Graph
-from match_the_tiles.logic.game_state import GameState
-import match_the_tiles.logic.reader
+from match_the_tiles.logic.reader import get_level
+from utils.utils import Coords
 
 mainClock = pygame.time.Clock()
 pygame.init()
@@ -53,14 +51,15 @@ def drawGoal(x, y, color):
 
 def drawboard(gamestate):
     matrix = gamestate.getGameStateMatrix()
+    d = gamestate.getGameStateDictionary()
     x = 150
     y = 150
-    for line in matrix:
-        for char in line:
+    for i in range(len(matrix)):
+        for j in range(len(matrix)):
             drawBlock(x, y, 'w')
-            if char == "#":
-                drawBlock(x, y, 'wall')
-            elif char != '.':
+            coord = Coords(i, j)
+            chars = d[coord]
+            for char in chars:
                 if char.lower() == char:
                     drawBlock(x, y, char.lower())
                 elif char.upper() == char:
@@ -68,7 +67,6 @@ def drawboard(gamestate):
             x = x + 100
         y = y + 100
         x = 150
-
 
 def main_menu():
     global click

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from match_the_tiles.model.tile_data import WallData, BlockData, GoalData
 from utils.utils import Coords
 import itertools
@@ -168,6 +170,19 @@ class GameState:
                 line.append(tipo)
             matrix.append(line)
         return matrix
+
+    """
+       Makes A Dictionary with the board
+    """
+    def getGameStateDictionary(self):
+        d = defaultdict(list)
+        for block in self.blocks:
+            d[block.coords].append(block.color)
+        for goal in self.common_gs.goals:
+            d[goal.coords].append(goal.color)
+        for wall in self.common_gs.walls:
+            d[wall.coords].append("#")
+        return d
 
     """
     Makes a copy of the list of blocks

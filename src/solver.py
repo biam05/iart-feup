@@ -31,6 +31,7 @@ def solver(level_no, advanced, algorithm):
     print(f"Move list - {path}")
     print(f"Number of moves - {len(path)}")
     print(f"Goals - {end_node.game_state.common_gs.goals}")
-    print(f"Blocks final positions - {end_node.game_state.blocks}")
+    print(f"Blocks final positions - {end_node.game_state.blocks}")    
+    print(f"Expanded Nodes - PLACEHOLDER")
 
 solver(1, True, "a-star")
