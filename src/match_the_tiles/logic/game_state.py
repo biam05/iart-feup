@@ -39,20 +39,43 @@ class CommonGameState:
         goal=goals[0]
         extra_walls=[]
         i=0
-        obstacleN = list(filter(lambda el: el[0] == goal[0]-1 and el[1] == goal[1], walls))
-        obstacleS = list(filter(lambda el: el[0] == goal[0]+1 and el[1] == goal[1], walls))
-        obstacleW = list(filter(lambda el: el[1] == goal[1]-1 and el[0] == goal[0], walls))
-        obstacleE = list(filter(lambda el: el[1] == goal[1]+1 and el[0] == goal[0], walls))
+        counter=1
+        finaldict={}
         while i!=cols:
             walls.extend([[-1,i],[cols,i]])
             walls.extend([[i,-1],[i,rows]])
             i=i+1
+
+        for wall in walls:
+            coord=Coords(wall[0],wall[1])
+            finaldict[coord]=[sys.maxsize,sys.maxsize,sys.maxsize,sys.maxsize]
+
+        obstacleN = list(filter(lambda el: el[0] == goal[0]-1 and el[1] == goal[1], walls))
+        if len(obstacleN):
+            finaldict = self.updateDict(0,finaldict,0,obstacleN[0][0],obstacleN[0][1])
+
+        obstacleS = list(filter(lambda el: el[0] == goal[0]+1 and el[1] == goal[1], walls))
+        if len(obstacleS):
+            finaldict = self.updateDict(1,finaldict,0,obstacleS[0][0],obstacleS[0][1])
+
+        obstacleW = list(filter(lambda el: el[1] == goal[1]-1 and el[0] == goal[0], walls))
+        if len(obstacleW):
+            finaldict = self.updateDict(2,finaldict,0,obstacleW[0][0],obstacleW[0][1])
+
+        obstacleE = list(filter(lambda el: el[1] == goal[1]+1 and el[0] == goal[0], walls))
+        if len(obstacleE):
+            finaldict = self.updateDict(3,finaldict,0,obstacleE[0][0],obstacleE[0][1])
+
         
-
+        
         obstacles=[obstacleN,obstacleS,obstacleW,obstacleE]
-        result=self.insert_vips(goals, walls, rows, cols,obstacles,[obstacleN],[obstacleS],[obstacleE],[obstacleW])
+        result=self.insert_vips(goals, walls, rows, cols,obstacles,finaldict,counter)
+        print(obstacles)
+        print(finaldict)
 
-    def insert_vips(self,goals, walls, rows, cols,obstacles,obstacleN,obstacleS,obstacleE,obstacleW):
+
+
+    def insert_vips(self,goals, walls, rows, cols,obstacles, finaldict,counter):
         new_E_walls=[]
         new_W_walls=[]
         new_N_walls=[]
@@ -90,12 +113,20 @@ class CommonGameState:
         new_E_walls=list(k for k,_ in itertools.groupby(new_E_walls))
         new_W_walls.sort()
         new_W_walls=list(k for k,_ in itertools.groupby(new_W_walls))
+        for wall in new_N_walls:
+            finaldict = self.updateDict(0,finaldict,counter,wall[0],wall[1])
 
-        obstacleE.append(new_E_walls)
-        obstacleW.append(new_W_walls)
-        obstacleN.append(new_N_walls)
-        obstacleS.append(new_S_walls)
-        
+        for wall in new_S_walls:
+            finaldict = self.updateDict(1,finaldict,counter,wall[0],wall[1])
+
+        for wall in new_E_walls:
+            finaldict = self.updateDict(2,finaldict,counter,wall[0],wall[1])
+
+        for wall in new_W_walls:
+            finaldict = self.updateDict(3,finaldict,counter,wall[0],wall[1])
+            
+
+        counter=counter+1
         walls=[x for x in walls if x not in new_E_walls]
         walls=[x for x in walls if x not in new_W_walls]
         walls=[x for x in walls if x not in new_N_walls]
@@ -103,11 +134,17 @@ class CommonGameState:
 
         obstacles=[new_N_walls,new_S_walls,new_W_walls,new_E_walls]
         if((not new_N_walls) and (not new_S_walls) and (not new_E_walls) and (not new_W_walls)):
-            return [obstacleN,obstacleS,obstacleE,obstacleW]
+            return finaldict
         
-        result=self.insert_vips(goals, walls, rows, cols,obstacles,obstacleN,obstacleS,obstacleE,obstacleW)
+        result=self.insert_vips(goals, walls, rows, cols,obstacles,finaldict,counter)
         return result
     
+    def updateDict(self,orientation,finaldict,counter,x,y):
+        coord=Coords(x,y)
+        previous=finaldict.get(coord)
+        previous[orientation]=counter
+        finaldict.update({coord:previous})
+        return finaldict
 
     def is_it_a_plane_is_it_a_bird_no_its_a_wall(self,walls,x,y):
         for wall in walls:
