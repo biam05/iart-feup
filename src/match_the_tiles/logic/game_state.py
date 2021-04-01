@@ -220,7 +220,7 @@ class GameState:
         moves = 0
 
         for block in self.blocks:
-            local_moves = sys.maxint
+            local_moves = sys.maxsize
             block_x = block.coords.x
             block_y = block.coords.y
             colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals)
@@ -245,6 +245,9 @@ class GameState:
             # non-colinear
             else:
                 local_moves = min(local_moves, 2)
+
+            moves = max(moves, local_moves)
+        return moves
 
     """
     Swipe Left Operation - Moves the movable blocks in the GameState to the left

@@ -33,4 +33,4 @@ def solver(level_no, advanced, algorithm):
     print(f"Goals - {end_node.game_state.common_gs.goals}")
     print(f"Blocks final positions - {end_node.game_state.blocks}")
 
-solver(35, True, "a-star")
+solver(1, True, "a-star")
