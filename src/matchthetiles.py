@@ -13,6 +13,24 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 click = False
 
 
+def scrollX(screenSurf, offsetX):
+    width, height = screenSurf.get_size()
+    copySurf = screenSurf.copy()
+    screenSurf.blit(copySurf, (offsetX, 0))
+    if offsetX < 0:
+        screenSurf.blit(copySurf, (width + offsetX, 0), (0, 0, -offsetX, height))
+    else:
+        screenSurf.blit(copySurf, (0, 0), (width - offsetX, 0, offsetX, height))
+
+def scrollY(screenSurf, offsetY):
+    width, height = screenSurf.get_size()
+    copySurf = screenSurf.copy()
+    screenSurf.blit(copySurf, (0, offsetY))
+    if offsetY < 0:
+        screenSurf.blit(copySurf, (0, height + offsetY), (0, 0, width, -offsetY))
+    else:
+        screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
+
 def write(text, x, y, color, size, screen):
     font = pygame.font.SysFont("Arial", size)
     text = font.render(text, True, pygame.Color(color))
@@ -292,7 +310,6 @@ def solveLevel(level, advanced, method):
     data = []
     running = True
     loading = True
-    calculated = False
     finished = False
     if method == "a-star":
         title = "Solver - A*"
@@ -316,18 +333,25 @@ def solveLevel(level, advanced, method):
         else:
             drawboard(game_state)
             write("Elapsed Time: " + str(data[1]) + "s    Number of Moves: " + str(data[3]),
-                  WIDTH // 2, 580, (255, 255, 255), 20, screen)
+                  WIDTH // 2, 575, (255, 255, 255), 20, screen)
             write("Goals: " + " ".join(str(x) for x in data[4]), WIDTH // 2,
-                  610, (255, 255, 255), 20, screen)
+                  600, (255, 255, 255), 20, screen)
             write("Blocks Final Positions: " + " ".join(str(x) for x in data[5]), WIDTH // 2,
-                  640, (255, 255, 255), 20, screen)
+                  625, (255, 255, 255), 20, screen)
             write("Expanded Nodes: " + str(data[6]), WIDTH // 2,
-                  670, (255, 255, 255), 20, screen)
-            write("Move: " + " ".join(str(x) for x in data[2]), WIDTH // 2,
-                  700, (255, 255, 255), 20, screen)
+                  650, (255, 255, 255), 20, screen)
+            write("Moves: " + " ".join(str(x) for x in data[2]), WIDTH // 2,
+                  675, (255, 255, 255), 20, screen)
 
         if game_state.is_game_over():
             finished = True
+
+        pressed = pygame.key.get_pressed()
+        # handle scrolling
+        if pressed[pygame.K_w]:
+            scrollY(screen, 2)
+        elif pressed[pygame.K_s]:
+            scrollY(screen, -2)
 
         for event in pygame.event.get():
             if event.type == QUIT:

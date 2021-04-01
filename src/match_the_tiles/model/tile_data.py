@@ -21,7 +21,7 @@ class BlockData:
         return f"BLOCK[{self.coords.x}, {self.coords.y}, {self.color}]"
 
     def __str__(self):
-        return f"BLOCK[{self.coords.x}, {self.coords.y}, {self.color}]"
+        return f"[{self.coords.x}, {self.coords.y}, {self.color}]"
 
     def __eq__(self, other):
         return self.coords == other.coords and self.color == other.color
@@ -47,7 +47,7 @@ class GoalData:
         return f"GOAL[{self.coords.x}, {self.coords.y}, {self.color}]"
 
     def __str__(self):
-        return f"GOAL[{self.coords.x}, {self.coords.y}, {self.color}]"
+        return f"[{self.coords.x}, {self.coords.y}, {self.color}]"
 
 class WallData:
     """
@@ -62,4 +62,4 @@ class WallData:
         return f"WALL[{self.coords.x}, {self.coords.y}]"
 
     def __str__(self):
-        return f"WALL[{self.coords.x}, {self.coords.y}]"
+        return f"[{self.coords.x}, {self.coords.y}]"

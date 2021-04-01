@@ -14,7 +14,10 @@ class Move(Enum):
     SWIPE_UP = 3
 
     def __str__(self):
-        return self.name
+        if self.name == "SWIPE_DOWN": return "Down"
+        if self.name == "SWIPE_LEFT": return "Left"
+        if self.name == "SWIPE_RIGHT": return "Right"
+        if self.name == "SWIPE_UP": return "Up"
 
 class CommonGameState:
     def __init__(self, walls : list, goals : list, rows : int, cols : int):
