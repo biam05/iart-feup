@@ -1,5 +1,6 @@
 from match_the_tiles.model.tile_data import WallData, BlockData, GoalData
 from utils.utils import Coords
+import itertools
 
 from enum import Enum
 from copy import deepcopy
@@ -12,14 +13,14 @@ class Move(Enum):
     SWIPE_UP = 3
 
 class CommonGameState:
-    """
-    Constructor
-    - List walls : List of coordinates of the walls (i.e. [x, y])
-    - List goals : List of coordinates and colors of the goals (i.e. [x, y, color])
-    - Int rows : Number of rows in the game board
-    - Int cols : Number of cols in the game board
-    """
     def __init__(self, walls : list, goals : list, rows : int, cols : int):
+        """
+        Constructor
+        - List walls : List of coordinates of the walls (i.e. [x, y])
+        - List goals : List of coordinates and colors of the goals (i.e. [x, y, color])
+        - Int rows : Number of rows in the game board
+        - Int cols : Number of cols in the game board
+        """
         self.walls = list()
         for wall in walls:
             self.walls.append(WallData(Coords(wall[0], wall[1])))
@@ -30,6 +31,88 @@ class CommonGameState:
 
         self.rows = rows
         self.cols = cols
+
+    #starts here
+    def get_goal_surrouding_walls(self,rows,cols,walls,goals):
+        goal=goals[0]
+        extra_walls=[]
+        i=0
+        obstacleN = list(filter(lambda el: el[0] == goal[0]-1 and el[1] == goal[1], walls))
+        obstacleS = list(filter(lambda el: el[0] == goal[0]+1 and el[1] == goal[1], walls))
+        obstacleW = list(filter(lambda el: el[1] == goal[1]-1 and el[0] == goal[0], walls))
+        obstacleE = list(filter(lambda el: el[1] == goal[1]+1 and el[0] == goal[0], walls))
+        while i!=cols:
+            walls.extend([[-1,i],[cols,i]])
+            walls.extend([[i,-1],[i,rows]])
+            i=i+1
+        
+
+        obstacles=[obstacleN,obstacleS,obstacleW,obstacleE]
+        result=self.insert_vips(goals, walls, rows, cols,obstacles,[obstacleN],[obstacleS],[obstacleE],[obstacleW])
+
+    def insert_vips(self,goals, walls, rows, cols,obstacles,obstacleN,obstacleS,obstacleE,obstacleW):
+        new_E_walls=[]
+        new_W_walls=[]
+        new_N_walls=[]
+        new_S_walls=[]
+        
+        for wall in obstacles[0]:#N
+            E_walls=list(filter(lambda el: el[1] == wall[1]+1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))#check for wall
+            W_walls=list(filter(lambda el: el[1] == wall[1]-1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))
+            new_E_walls.extend(E_walls)
+            new_W_walls.extend(W_walls)
+            
+        for wall in obstacles[1]:#S
+            E_walls=list(filter(lambda el: el[1] == wall[1]+1 and el[0] < wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))
+            W_walls=list(filter(lambda el: el[1] == wall[1]-1 and el[0] < wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))
+            new_E_walls.extend(E_walls)
+            new_W_walls.extend(W_walls)
+
+        for wall in obstacles[2]:#W
+            N_walls=list(filter(lambda el: el[0] == wall[0]-1 and el[1] > wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            S_walls=list(filter(lambda el: el[0] == wall[0]+1 and el[1] > wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            new_N_walls.extend(N_walls)
+            new_S_walls.extend(S_walls)
+
+        for wall in obstacles[3]:#E
+            N_walls=list(filter(lambda el: el[0] == wall[0]-1 and el[1] < wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            S_walls=list(filter(lambda el: el[0] == wall[0]+1 and el[1] < wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            new_N_walls.extend(N_walls)
+            new_S_walls.extend(S_walls)
+
+        new_N_walls.sort()
+        new_N_walls=list(k for k,_ in itertools.groupby(new_N_walls))
+        new_S_walls.sort()
+        new_S_walls=list(k for k,_ in itertools.groupby(new_S_walls))
+        new_E_walls.sort()
+        new_E_walls=list(k for k,_ in itertools.groupby(new_E_walls))
+        new_W_walls.sort()
+        new_W_walls=list(k for k,_ in itertools.groupby(new_W_walls))
+
+        obstacleE.append(new_E_walls)
+        obstacleW.append(new_W_walls)
+        obstacleN.append(new_N_walls)
+        obstacleS.append(new_S_walls)
+        
+        walls=[x for x in walls if x not in new_E_walls]
+        walls=[x for x in walls if x not in new_W_walls]
+        walls=[x for x in walls if x not in new_N_walls]
+        walls=[x for x in walls if x not in new_S_walls]
+
+        obstacles=[new_N_walls,new_S_walls,new_W_walls,new_E_walls]
+        if((not new_N_walls) and (not new_S_walls) and (not new_E_walls) and (not new_W_walls)):
+            return [obstacleN,obstacleS,obstacleE,obstacleW]
+        
+        result=self.insert_vips(goals, walls, rows, cols,obstacles,obstacleN,obstacleS,obstacleE,obstacleW)
+        return result
+    
+
+    def is_it_a_plane_is_it_a_bird_no_its_a_wall(self,walls,x,y):
+        for wall in walls:
+            if(x==wall[0] and y==wall[1]):
+                return False
+        return True
+    #ends here
 
 class GameState:
     """
@@ -108,38 +191,7 @@ class GameState:
     Evaluates GameState value
     """
     def eval_game_state(self):
-        if (self.points == -1):
-            self.points = 0
-            for goal in self.common_gs.goals:
-                goal_x = goal.coords.x
-                goal_y = goal.coords.y
-                goal_color = goal.color
-                for block in self.blocks:
-                    obstacles = filter(lambda el: el != block, self.blocks + self.common_gs.walls)
-                    block_x = block.coords.x
-                    block_y = block.coords.y
-                    block_color = block.color
-                    if goal_color == block_color:
-                        if goal_x == block_x and goal_y == block_y: # block matches goal
-                            self.points += 1
-                        elif goal_x == block_x and goal_y != block_y: # same row but different column
-                            self.points += 2
-                            for obstacle in obstacles:
-                                # wall between goal and block
-                                if obstacle[0] == goal_x and ((obstacle.coords.x > goal_x and obstacle.coords.x < block_x)or(obstacle.coords.x < goal_x and obstacle.coords.x > block_x)): 
-                                    self.points += 2
-                                    break
-                        elif goal_y == block_y and goal_x != block_x: # same column but different row
-                            self.points += 2 
-                            for obstacle in obstacles:
-                                # wall between goal and block
-                                if obstacle.coords.y == goal_y and ((obstacle.coords.y > goal_y and obstacle.coords.y < block_y)or(obstacle.coords.y < goal_y and obstacle.coords.y > block_y)): 
-                                    self.points += 2 
-                                    break
-                        else:
-                            self.points+=4
-
-        return self.nMoves + self.points # evaluate based on current state
+        return self.nMoves
 
     """
     Checks if there's a wall adjacent to the goal on the direction the block is moving
@@ -161,10 +213,6 @@ class GameState:
 
     """
     Estimates the number of moves needed to finish the game from a GameState
-    - Coords[] goals : List of coordinates of the goals
-    - Coords[] walls : List of coordinates of the walls
-    - Int rows : Number of rows on the game board
-    - Int cols : Number of columns on the game board
 
     Returns the estimate number of moves needed to finish the game 
     """
@@ -175,7 +223,7 @@ class GameState:
             local_moves = sys.maxint
             block_x = block.coords.x
             block_y = block.coords.y
-            colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), goals)
+            colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals)
             # colinear
             if (colinear_goals):
                 for goal in colinear_goals:
@@ -184,27 +232,19 @@ class GameState:
                     if goal_x == block_x and goal_y == block_y:
                         local_moves = min(local_moves, 0)
                         break
-                    obstacles = filter(lambda el: el != block and el.in_between(goal, block), self.blocks + walls)
+                    obstacles = filter(lambda el: el != block and el.in_between(goal, block), self.blocks + self.common_gs.walls)
                     # has an obstacle between the block and the goal
                     if obstacles:
                         local_moves = min(local_moves, 3)
                     else:
-                        if (goal_x == block_x and (goal_y == 0 or goal_y == cols - 1)) or (goal_y == block_y and (goal_x == 0 or goal_x == rows - 1)):
+                        if (goal_x == block_x and (goal_y == 0 or goal_y == self.common_gs.cols - 1)) or (goal_y == block_y and (goal_x == 0 or goal_x == self.common_gs.rows - 1)):
                             local_moves = min(local_moves, 1)
                         else:
-                            obstacles = filter(lambda el: self.is_wall_stopping_block_at_goal(block, goal, el), walls)
+                            obstacles = filter(lambda el: self.is_wall_stopping_block_at_goal(block, goal, el), self.common_gs.walls)
                             local_moves = min(local_moves, 1 if obstacles else 2)
             # non-colinear
             else:
-                matching_goals = filter(lambda el: el.color == block.color, goals)
-                for goal in matching_goals:
-                    """
-                    # horizontal move
-
-                    # vertical move
-                    colinear_walls_with_move = filter(lambda el: el[1] == block_y and ((el[0] <= goal_x - 1 and goal_x < block_x) or (el[0] >= goal_x + 1 and goal_x > block_x)))
-                    closest_wall = min(, key=lambda el: abs(el[0] - block_x))
-                    """
+                local_moves = min(local_moves, 2)
 
     """
     Swipe Left Operation - Moves the movable blocks in the GameState to the left
@@ -284,3 +324,7 @@ class GameState:
             if (not found):
                 return False
         return True
+
+
+    
+    
