@@ -3,6 +3,7 @@ import sys
 from pygame.locals import *
 from match_the_tiles.logic.reader import get_level
 from utils.utils import Coords
+from solver import solver
 
 mainClock = pygame.time.Clock()
 pygame.init()
@@ -11,6 +12,24 @@ WIDTH = HEIGHT = 700
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 click = False
 
+
+def scrollX(screenSurf, offsetX):
+    width, height = screenSurf.get_size()
+    copySurf = screenSurf.copy()
+    screenSurf.blit(copySurf, (offsetX, 0))
+    if offsetX < 0:
+        screenSurf.blit(copySurf, (width + offsetX, 0), (0, 0, -offsetX, height))
+    else:
+        screenSurf.blit(copySurf, (0, 0), (width - offsetX, 0, offsetX, height))
+
+def scrollY(screenSurf, offsetY):
+    width, height = screenSurf.get_size()
+    copySurf = screenSurf.copy()
+    screenSurf.blit(copySurf, (0, offsetY))
+    if offsetY < 0:
+        screenSurf.blit(copySurf, (0, height + offsetY), (0, 0, width, -offsetY))
+    else:
+        screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
 
 def write(text, x, y, color, size, screen):
     font = pygame.font.SysFont("Arial", size)
@@ -40,8 +59,8 @@ def drawBlock(x, y, color):
     block = pygame.Rect(x, y, 100, 100)
     c = getColor(color)
     pygame.draw.rect(screen, c, block)
-    for i in range(4): # borders
-        pygame.draw.rect(screen, (0,0,0), (x-i,y-i,155,155), 1)
+    for i in range(4):  # borders
+        pygame.draw.rect(screen, (0, 0, 0), (x - i, y - i, 155, 155), 1)
 
 
 def drawGoal(x, y, color):
@@ -68,6 +87,22 @@ def drawboard(gamestate):
         y = y + 100
         x = 150
 
+
+def drawButtonLevels():
+    buttons = []
+    x = 120
+    y = 120
+    for i in range(7):
+        for j in range(6):
+            button = pygame.Rect(x, y, 60, 60)
+            buttons.append(button)
+            x = x + 80
+        y = y + 80
+        x = 120
+
+    return buttons
+
+
 def main_menu():
     global click
     while True:
@@ -88,7 +123,8 @@ def main_menu():
 
         if button_1.collidepoint((mx, my)):
             if click:
-                solver()
+                click = False
+                solverMenu()
         if button_2.collidepoint((mx, my)):
             if click:
                 play("1", False)
@@ -113,14 +149,34 @@ def main_menu():
         mainClock.tick(60)
 
 
-def solver():
+def solverMenu():
+    global click
     running = True
     while running:
         screen.fill((0, 0, 0))
+        level = 1
+        mx, my = pygame.mouse.get_pos()
+        write("Choose a Level (A - Advanced)", WIDTH // 2, 60, (255, 255, 255), 60, screen)
+        buttons = drawButtonLevels()
+        for button in buttons:
+            pygame.draw.rect(screen, (0, 204, 255), button)
+            if level > 20:
+                write(str(level - 20) + "A", button.x + 30, button.y + 30, (0, 0, 0), 30, screen)
+            else:
+                write(str(level), button.x + 30, button.y + 30, (0, 0, 0), 30, screen)
+            level = level + 1
 
-        write("SOLVER", WIDTH // 2, HEIGHT // 2 - 100, (255, 255, 255), 50, screen)
-        write("NOT IMPLEMENTED YET", WIDTH // 2, HEIGHT // 2 + 50, (255, 255, 255), 50, screen)
+        for i in range(len(buttons)):
+            if buttons[i].collidepoint((mx, my)):
+                if click:
+                    level = i + 1
+                    click = False
+                    if level > 20:
+                        solverSearchMethod(level - 20, True)
+                    else:
+                        solverSearchMethod(level, False)
 
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -128,6 +184,9 @@ def solver():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
 
         pygame.display.update()
         mainClock.tick(60)
@@ -145,7 +204,7 @@ def play(level, advanced):
         if advanced:
             write("Level " + level + " Advanced", WIDTH // 2, 60, (255, 255, 255), 60, screen)
         else:
-            write("Level " + level + " Advanced", WIDTH // 2, 60, (255, 255, 255), 60, screen)
+            write("Level " + level, WIDTH // 2, 60, (255, 255, 255), 60, screen)
         write("Number of Moves: " + str(nmoves), WIDTH // 2, 120, (255, 255, 255), 30, screen)
         drawboard(game_state)
         if game_state.is_game_over():
@@ -174,20 +233,20 @@ def play(level, advanced):
                         running = False
                         next = True
                 else:
+                    ngame_state = game_state
                     if event.key == K_LEFT:
-                        game_state = game_state.swipe_left()
-                        nmoves = nmoves + 1
+                        ngame_state = game_state.swipe_left()
                     if event.key == K_RIGHT:
-                        game_state = game_state.swipe_right()
-                        nmoves = nmoves + 1
+                        ngame_state = game_state.swipe_right()
                     if event.key == K_UP:
-                        game_state = game_state.swipe_up()
-                        nmoves = nmoves + 1
+                        ngame_state = game_state.swipe_up()
                     if event.key == K_DOWN:
-                        game_state = game_state.swipe_down()
-                        nmoves = nmoves + 1
+                        ngame_state = game_state.swipe_down()
                     if event.key == K_h:
                         print("Not Implemented Yet (Hint)")
+                    if ngame_state != game_state:
+                        nmoves = nmoves + 1
+                    game_state = ngame_state
 
         pygame.display.update()
         mainClock.tick(60)
@@ -196,6 +255,123 @@ def play(level, advanced):
         if next:
             nextlevel = int(level) + 1
             play(str(nextlevel), advanced)
+
+
+def solverSearchMethod(level, advanced):
+    global click
+    running = True
+    while running:
+        screen.fill((0, 0, 0))
+        mx, my = pygame.mouse.get_pos()
+        write("Solver - Search Method", WIDTH // 2, 60, (255, 255, 255), 60, screen)
+        if advanced:
+            write("Level " + str(level) + " Advanced", WIDTH // 2, 120, (255, 255, 255), 30, screen)
+        else:
+            write("Level " + str(level), WIDTH // 2, 120, (255, 255, 255), 30, screen)
+
+        button_1 = pygame.Rect(135, 200, 430, 100)  # button to solver
+        button_2 = pygame.Rect(135, 350, 430, 100)  # button to play normal
+        button_3 = pygame.Rect(135, 500, 430, 100)  # button to play advanced
+        pygame.draw.rect(screen, (0, 204, 255), button_1)
+        pygame.draw.rect(screen, (0, 204, 255), button_2)
+        pygame.draw.rect(screen, (0, 204, 255), button_3)
+        write("BFS", WIDTH // 2, 250, (0, 0, 0), 50, screen)
+        write("Uniform Cost Search", WIDTH // 2, 400, (0, 0, 0), 50, screen)
+        write("A*", WIDTH // 2, 550, (0, 0, 0), 50, screen)
+
+        if button_1.collidepoint((mx, my)):
+            if click:
+                solveLevel(level, advanced, "bfs")
+        if button_2.collidepoint((mx, my)):
+            if click:
+                solveLevel(level, advanced, "ucs")
+        if button_3.collidepoint((mx, my)):
+            if click:
+                solveLevel(level, advanced, "a-star")
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.display.update()
+        mainClock.tick(60)
+
+
+def solveLevel(level, advanced, method):
+    title = ""
+    data = []
+    running = True
+    loading = True
+    finished = False
+    if method == "a-star":
+        title = "Solver - A*"
+    elif method == "bfs":
+        title = "Solver - BFS"
+    elif method == "ucs":
+        title = "Solver -  UCS"
+    game_state = get_level(level, advanced)
+    while running:
+        screen.fill((0, 0, 0))
+        write(title, WIDTH // 2, 60, (255, 255, 255), 60, screen)
+        if advanced:
+            write("Level " + str(level) + " Advanced", WIDTH // 2, 120, (255, 255, 255), 30, screen)
+        else:
+            write("Level " + str(level), WIDTH // 2, 120, (255, 255, 255), 30, screen)
+        if loading:
+            write("Loading...", WIDTH // 2, HEIGHT // 2, (255, 255, 255), 60, screen)
+            pygame.display.update()
+            data = solver(level, advanced, method)
+            loading = False
+        else:
+            drawboard(game_state)
+            write("Elapsed Time: " + str(data[1]) + "s    Number of Moves: " + str(data[3]),
+                  WIDTH // 2, 575, (255, 255, 255), 20, screen)
+            write("Goals: " + " ".join(str(x) for x in data[4]), WIDTH // 2,
+                  600, (255, 255, 255), 20, screen)
+            write("Blocks Final Positions: " + " ".join(str(x) for x in data[5]), WIDTH // 2,
+                  625, (255, 255, 255), 20, screen)
+            write("Expanded Nodes: " + str(data[6]), WIDTH // 2,
+                  650, (255, 255, 255), 20, screen)
+            write("Moves: " + " ".join(str(x) for x in data[2]), WIDTH // 2,
+                  675, (255, 255, 255), 20, screen)
+
+        if game_state.is_game_over():
+            finished = True
+
+        pressed = pygame.key.get_pressed()
+        # handle scrolling
+        if pressed[pygame.K_w]:
+            scrollY(screen, 2)
+        elif pressed[pygame.K_s]:
+            scrollY(screen, -2)
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+                if not loading and not finished:
+                    if event.key == K_LEFT:
+                        game_state = game_state.swipe_left()
+                    if event.key == K_RIGHT:
+                        game_state = game_state.swipe_right()
+                    if event.key == K_UP:
+                        game_state = game_state.swipe_up()
+                    if event.key == K_DOWN:
+                        game_state = game_state.swipe_down()
+
+        pygame.display.update()
+        mainClock.tick(60)
 
 
 main_menu()

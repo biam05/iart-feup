@@ -5,7 +5,6 @@ from utils.utils import Coords
 import itertools
 
 from enum import Enum
-from copy import deepcopy
 import sys
 
 class Move(Enum):
@@ -13,6 +12,12 @@ class Move(Enum):
     SWIPE_DOWN = 1
     SWIPE_RIGHT = 2
     SWIPE_UP = 3
+
+    def __str__(self):
+        if self.name == "SWIPE_DOWN": return "Down"
+        if self.name == "SWIPE_LEFT": return "Left"
+        if self.name == "SWIPE_RIGHT": return "Right"
+        if self.name == "SWIPE_UP": return "Up"
 
 class CommonGameState:
     def __init__(self, walls : list, goals : list, rows : int, cols : int):
@@ -380,6 +385,3 @@ class GameState:
                 return False
         return True
 
-
-    
-    

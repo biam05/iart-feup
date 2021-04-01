@@ -1,7 +1,5 @@
 from match_the_tiles.logic.reader import get_level, read_file
 from graph.graph import Graph
-from match_the_tiles.logic.game_state import GameState
-import match_the_tiles.logic.reader
 
 from datetime import datetime
 
@@ -27,11 +25,16 @@ def solver(level_no, advanced, algorithm):
     elapsed_time = end_time-start_time
 
     print(f"Running algorithm {algorithm}")
-    print(f"Elapsed time - {elapsed_time.total_seconds()}s {elapsed_time.microseconds / 1000}ms")
+    print(f"Elapsed time - {elapsed_time.total_seconds()}s")
     print(f"Move list - {path}")
     print(f"Number of moves - {len(path)}")
     print(f"Goals - {end_node.game_state.common_gs.goals}")
     print(f"Blocks final positions - {end_node.game_state.blocks}")    
     print(f"Expanded Nodes - PLACEHOLDER")
 
-solver(1, True, "a-star")
+    return [algorithm, elapsed_time.total_seconds(), path,
+            len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
+            2]
+
+solver(16, True, "bfs")
+
