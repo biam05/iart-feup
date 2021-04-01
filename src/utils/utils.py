@@ -42,5 +42,6 @@ class Coords:
             return (self.x > c1.x and self.x < c2.x) or (self.x < c1.x and self.x > c2.x)
         return False
 
+
     def __hash__(self):
         return hash((self.x, self.y))

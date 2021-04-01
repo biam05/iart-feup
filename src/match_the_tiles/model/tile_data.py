@@ -19,7 +19,12 @@ class BlockData:
     
     def __repr__(self):
         return f"BLOCK[{self.coords.x}, {self.coords.y}, {self.color}]"
-    
+
+    def __str__(self):
+        return f"BLOCK[{self.coords.x}, {self.coords.y}, {self.color}]"
+
+    def __eq__(self, other):
+        return self.coords == other.coords and self.color == other.color
 
 class GoalData:
     """
@@ -41,6 +46,9 @@ class GoalData:
     def __repr__(self):
         return f"GOAL[{self.coords.x}, {self.coords.y}, {self.color}]"
 
+    def __str__(self):
+        return f"GOAL[{self.coords.x}, {self.coords.y}, {self.color}]"
+
 class WallData:
     """
     Constructor
@@ -51,4 +59,7 @@ class WallData:
         self.coords = coords
     
     def __repr__(self):
+        return f"WALL[{self.coords.x}, {self.coords.y}]"
+
+    def __str__(self):
         return f"WALL[{self.coords.x}, {self.coords.y}]"
