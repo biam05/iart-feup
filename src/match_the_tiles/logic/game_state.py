@@ -130,6 +130,44 @@ class GameState:
         self.move = move
         self.nMoves = nMoves
         self.points = -1
+    
+    def __repr__(self):
+        out = ""
+        matrix = self.getGameStateMatrix()
+        for i in matrix:
+            out += "\n"
+            for j in i:
+                out += j + "\t"
+        out += "\n"
+        return out
+
+    """
+    Makes A Matrix with the board
+    """
+    def getGameStateMatrix(self):
+        matrix = []
+        for i in range(self.common_gs.rows):
+            line = []
+            for j in range(self.common_gs.cols):
+                coord = Coords(i, j)
+                tipo = "."
+                for block in self.blocks:
+                    if coord == block.coords:
+                        tipo = block.color
+                        break
+                for goal in self.common_gs.goals:
+                    if tipo != ".": break
+                    if coord == goal.coords:
+                        tipo = goal.color
+                        break
+                for wall in self.common_gs.walls:
+                    if tipo != ".": break
+                    if coord == wall.coords:
+                        tipo = "#"
+                        break
+                line.append(tipo)
+            matrix.append(line)
+        return matrix
 
     """
     Makes a copy of the list of blocks
@@ -253,7 +291,6 @@ class GameState:
             walls = sorted(filter(lambda el: el.coords.y == block.coords.y and el.coords.x < block.coords.x, new_blocks[:i] + self.common_gs.walls), key=lambda el: -el.coords.x)
             new_row = walls[0].coords.x + 1 if walls else 0
             new_blocks[i].coords.setX(new_row)
-        
         return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_UP, nMoves=(self.nMoves + 1))
 
     """

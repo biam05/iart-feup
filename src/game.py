@@ -1,58 +1,38 @@
-import pygame, sys
-from pygame.locals import *
-from game_state import GameState
+from match_the_tiles.logic.reader import get_level, read_file
+from graph.graph import Graph
+from match_the_tiles.logic.game_state import GameState
+import match_the_tiles.logic.reader
 
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
 
-test_state = [
-    [1, 1, 0, 1],
-    [0, 1, [2, "purple"], 0],
-    [[3, "purple"], 1, [2, "purple"], 1],
-    [0, 0, 0, [3, "purple"]]
-]
+def game(level_no, advanced):
+    game_state = get_level(level_no, advanced=advanced)
+    
+    while(not game_state.is_game_over()):        
+        print(game_state)
+        direction = get_valid_input()
+        if direction == "L":
+            game_state = game_state.swipe_left()  
+            print("Move: Left")
+        elif direction == "U":
+            game_state = game_state.swipe_up()
+            print("Move: Up")
+        elif direction == "R":
+            game_state = game_state.swipe_right()  
+            print("Move: Right")
+        elif direction == "D":
+            game_state = game_state.swipe_down()  
+            print("Move: Down")
+        elif direction == "H":
+            print("Hints not Implemented Yet")
+            
+    print(game_state)
+    print("Finished Level")
 
-walls = [ [0, 0], [0, 1], [0, 3], [1, 1], [2, 1], [2, 3] ]
-blocks = [ [1, 2, "purple"], [2, 2, "purple"] ]
-goals = [ [2, 0, "purple"], [3, 3, "purple"] ]
+def get_valid_input():
+    while(True):
+        direction = input("L(eft) U(p) R(ight) D(own) or H(int): ")
+        if direction.upper() in ["L", "U", "R", "D", "H"] :
+            return direction.upper() 
 
-game_state = GameState(4, 4, walls, blocks, goals)
 
-print(game_state)
-
-game_state.swipe_down()
-
-print(game_state)
-
-"""
-def grid(block_size, centered=False):
-    real_block_size = block_size+1
-    width = WINDOW_WIDTH // real_block_size
-    height = WINDOW_HEIGHT // real_block_size
-    offset_x = 0
-    offset_y = 0
-    if (centered):
-        offset_x = (SCREEN.get_width() - real_block_size*width)//2
-        offset_y = (SCREEN.get_height() - real_block_size*height)//2
-
-    for x in range(width):
-        for y in range(height):
-            rect = pygame.Rect(offset_x + x * real_block_size, offset_y + y * real_block_size, block_size, block_size)
-            pygame.draw.rect(SCREEN, (200, 200, 200), rect, 1)
-
-def main():
-    global SCREEN
-    pygame.init()
-    SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption('Match-the-Tiles')
-
-    while True:
-        grid(32, True)
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                return
-
-        pygame.display.flip()
-
-if __name__ == '__main__': main()
-"""
+game(1, False)
