@@ -153,38 +153,7 @@ class GameState:
     Evaluates GameState value
     """
     def eval_game_state(self):
-        if (self.points == -1):
-            self.points = 0
-            for goal in self.common_gs.goals:
-                goal_x = goal.coords.x
-                goal_y = goal.coords.y
-                goal_color = goal.color
-                for block in self.blocks:
-                    obstacles = filter(lambda el: el != block, self.blocks + self.common_gs.walls)
-                    block_x = block.coords.x
-                    block_y = block.coords.y
-                    block_color = block.color
-                    if goal_color == block_color:
-                        if goal_x == block_x and goal_y == block_y: # block matches goal
-                            self.points += 1
-                        elif goal_x == block_x and goal_y != block_y: # same row but different column
-                            self.points += 2
-                            for obstacle in obstacles:
-                                # wall between goal and block
-                                if obstacle[0] == goal_x and ((obstacle.coords.x > goal_x and obstacle.coords.x < block_x)or(obstacle.coords.x < goal_x and obstacle.coords.x > block_x)): 
-                                    self.points += 2
-                                    break
-                        elif goal_y == block_y and goal_x != block_x: # same column but different row
-                            self.points += 2 
-                            for obstacle in obstacles:
-                                # wall between goal and block
-                                if obstacle.coords.y == goal_y and ((obstacle.coords.y > goal_y and obstacle.coords.y < block_y)or(obstacle.coords.y < goal_y and obstacle.coords.y > block_y)): 
-                                    self.points += 2 
-                                    break
-                        else:
-                            self.points+=4
-
-        return self.nMoves + self.points # evaluate based on current state
+        return self.nMoves
 
     """
     Checks if there's a wall adjacent to the goal on the direction the block is moving
@@ -206,10 +175,6 @@ class GameState:
 
     """
     Estimates the number of moves needed to finish the game from a GameState
-    - Coords[] goals : List of coordinates of the goals
-    - Coords[] walls : List of coordinates of the walls
-    - Int rows : Number of rows on the game board
-    - Int cols : Number of columns on the game board
 
     Returns the estimate number of moves needed to finish the game 
     """
@@ -220,7 +185,7 @@ class GameState:
             local_moves = sys.maxint
             block_x = block.coords.x
             block_y = block.coords.y
-            colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), goals)
+            colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals)
             # colinear
             if (colinear_goals):
                 for goal in colinear_goals:
@@ -229,27 +194,19 @@ class GameState:
                     if goal_x == block_x and goal_y == block_y:
                         local_moves = min(local_moves, 0)
                         break
-                    obstacles = filter(lambda el: el != block and el.in_between(goal, block), self.blocks + walls)
+                    obstacles = filter(lambda el: el != block and el.in_between(goal, block), self.blocks + self.common_gs.walls)
                     # has an obstacle between the block and the goal
                     if obstacles:
                         local_moves = min(local_moves, 3)
                     else:
-                        if (goal_x == block_x and (goal_y == 0 or goal_y == cols - 1)) or (goal_y == block_y and (goal_x == 0 or goal_x == rows - 1)):
+                        if (goal_x == block_x and (goal_y == 0 or goal_y == self.common_gs.cols - 1)) or (goal_y == block_y and (goal_x == 0 or goal_x == self.common_gs.rows - 1)):
                             local_moves = min(local_moves, 1)
                         else:
-                            obstacles = filter(lambda el: self.is_wall_stopping_block_at_goal(block, goal, el), walls)
+                            obstacles = filter(lambda el: self.is_wall_stopping_block_at_goal(block, goal, el), self.common_gs.walls)
                             local_moves = min(local_moves, 1 if obstacles else 2)
             # non-colinear
             else:
-                matching_goals = filter(lambda el: el.color == block.color, goals)
-                for goal in matching_goals:
-                    """
-                    # horizontal move
-
-                    # vertical move
-                    colinear_walls_with_move = filter(lambda el: el[1] == block_y and ((el[0] <= goal_x - 1 and goal_x < block_x) or (el[0] >= goal_x + 1 and goal_x > block_x)))
-                    closest_wall = min(, key=lambda el: abs(el[0] - block_x))
-                    """
+                local_moves = min(local_moves, 2)
 
     """
     Swipe Left Operation - Moves the movable blocks in the GameState to the left
