@@ -1,5 +1,6 @@
 from match_the_tiles.model.tile_data import WallData, BlockData, GoalData
 from utils.utils import Coords
+import itertools
 
 from enum import Enum
 from copy import deepcopy
@@ -30,6 +31,88 @@ class CommonGameState:
 
         self.rows = rows
         self.cols = cols
+
+    #starts here
+    def get_goal_surrouding_walls(self,rows,cols,walls,goals):
+        goal=goals[0]
+        extra_walls=[]
+        i=0
+        obstacleN = list(filter(lambda el: el[0] == goal[0]-1 and el[1] == goal[1], walls))
+        obstacleS = list(filter(lambda el: el[0] == goal[0]+1 and el[1] == goal[1], walls))
+        obstacleW = list(filter(lambda el: el[1] == goal[1]-1 and el[0] == goal[0], walls))
+        obstacleE = list(filter(lambda el: el[1] == goal[1]+1 and el[0] == goal[0], walls))
+        while i!=cols:
+            walls.extend([[-1,i],[cols,i]])
+            walls.extend([[i,-1],[i,rows]])
+            i=i+1
+        
+
+        obstacles=[obstacleN,obstacleS,obstacleW,obstacleE]
+        result=self.insert_vips(goals, walls, rows, cols,obstacles,[obstacleN],[obstacleS],[obstacleE],[obstacleW])
+
+    def insert_vips(self,goals, walls, rows, cols,obstacles,obstacleN,obstacleS,obstacleE,obstacleW):
+        new_E_walls=[]
+        new_W_walls=[]
+        new_N_walls=[]
+        new_S_walls=[]
+        
+        for wall in obstacles[0]:#N
+            E_walls=list(filter(lambda el: el[1] == wall[1]+1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))#check for wall
+            W_walls=list(filter(lambda el: el[1] == wall[1]-1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))
+            new_E_walls.extend(E_walls)
+            new_W_walls.extend(W_walls)
+            
+        for wall in obstacles[1]:#S
+            E_walls=list(filter(lambda el: el[1] == wall[1]+1 and el[0] < wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))
+            W_walls=list(filter(lambda el: el[1] == wall[1]-1 and el[0] < wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,el[0],wall[1]), walls))
+            new_E_walls.extend(E_walls)
+            new_W_walls.extend(W_walls)
+
+        for wall in obstacles[2]:#W
+            N_walls=list(filter(lambda el: el[0] == wall[0]-1 and el[1] > wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            S_walls=list(filter(lambda el: el[0] == wall[0]+1 and el[1] > wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            new_N_walls.extend(N_walls)
+            new_S_walls.extend(S_walls)
+
+        for wall in obstacles[3]:#E
+            N_walls=list(filter(lambda el: el[0] == wall[0]-1 and el[1] < wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            S_walls=list(filter(lambda el: el[0] == wall[0]+1 and el[1] < wall[1] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(walls,wall[0],el[1]), walls))
+            new_N_walls.extend(N_walls)
+            new_S_walls.extend(S_walls)
+
+        new_N_walls.sort()
+        new_N_walls=list(k for k,_ in itertools.groupby(new_N_walls))
+        new_S_walls.sort()
+        new_S_walls=list(k for k,_ in itertools.groupby(new_S_walls))
+        new_E_walls.sort()
+        new_E_walls=list(k for k,_ in itertools.groupby(new_E_walls))
+        new_W_walls.sort()
+        new_W_walls=list(k for k,_ in itertools.groupby(new_W_walls))
+
+        obstacleE.append(new_E_walls)
+        obstacleW.append(new_W_walls)
+        obstacleN.append(new_N_walls)
+        obstacleS.append(new_S_walls)
+        
+        walls=[x for x in walls if x not in new_E_walls]
+        walls=[x for x in walls if x not in new_W_walls]
+        walls=[x for x in walls if x not in new_N_walls]
+        walls=[x for x in walls if x not in new_S_walls]
+
+        obstacles=[new_N_walls,new_S_walls,new_W_walls,new_E_walls]
+        if((not new_N_walls) and (not new_S_walls) and (not new_E_walls) and (not new_W_walls)):
+            return [obstacleN,obstacleS,obstacleE,obstacleW]
+        
+        result=self.insert_vips(goals, walls, rows, cols,obstacles,obstacleN,obstacleS,obstacleE,obstacleW)
+        return result
+    
+
+    def is_it_a_plane_is_it_a_bird_no_its_a_wall(self,walls,x,y):
+        for wall in walls:
+            if(x==wall[0] and y==wall[1]):
+                return False
+        return True
+    #ends here
 
 class GameState:
     """
@@ -247,3 +330,7 @@ class GameState:
             if (not found):
                 return False
         return True
+
+
+    
+    
