@@ -278,11 +278,9 @@ class GameState:
             local_moves = sys.maxsize
             block_x = block.coords.x
             block_y = block.coords.y
-            colinear_goals = list(filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals))
+            colinear_goals = filter(lambda el: el.color.upper() == block.color.upper() and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals)
             # colinear
-            print(colinear_goals)
-            print(len(colinear_goals))
-            if len(colinear_goals) != 0:
+            if colinear_goals:
                 print(0)
                 for goal in colinear_goals:
                     goal_x = goal.coords.x
