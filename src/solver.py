@@ -24,14 +24,6 @@ def solver(level_no, advanced, algorithm):
 
     elapsed_time = end_time-start_time
 
-    print(f"Running algorithm {algorithm}")
-    print(f"Elapsed time - {elapsed_time.total_seconds()}s")
-    print(f"Move list - {path}")
-    print(f"Number of moves - {len(path)}")
-    print(f"Goals - {end_node.game_state.common_gs.goals}")
-    print(f"Blocks final positions - {end_node.game_state.blocks}")    
-    print(f"Expanded Nodes - PLACEHOLDER")
-
     return [algorithm, elapsed_time.total_seconds(), path,
             len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             2]

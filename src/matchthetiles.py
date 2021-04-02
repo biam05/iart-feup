@@ -243,7 +243,20 @@ def play(level, advanced):
                     if event.key == K_DOWN:
                         ngame_state = game_state.swipe_down()
                     if event.key == K_h:
-                        print("Not Implemented Yet (Hint)")
+                        gl = game_state.swipe_left()
+                        gr = game_state.swipe_right()
+                        gu = game_state.swipe_up()
+                        gd = game_state.swipe_down()
+                        nl = gl.estimate_moves_left()
+                        nr = gr.estimate_moves_left()
+                        nu = gu.estimate_moves_left()
+                        nd = gd.estimate_moves_left()
+                        print(nl, nr, nu, nd)
+                        better = min(nl, nr, nu, nd)
+                        if better == nl: hint("L")
+                        elif better == nr: hint("R")
+                        elif better == nu: hint("U")
+                        elif better == nd: hint("D")
                     if ngame_state != game_state:
                         nmoves = nmoves + 1
                     game_state = ngame_state
@@ -255,6 +268,37 @@ def play(level, advanced):
         if next:
             nextlevel = int(level) + 1
             play(str(nextlevel), advanced)
+
+
+def hint(direction):
+    running = True
+    hint = ""
+    while running:
+        screen.fill((0, 0, 0))
+
+        write("Hint", WIDTH // 2, 60, (255, 255, 255), 60, screen)
+
+        if direction == "R": hint = "Swipe Right"
+        elif direction == "L": hint = "Swipe Left"
+        elif direction == "U": hint = "Swipe Up"
+        elif direction == "D": hint = "Swipe Down"
+
+
+        write(hint, WIDTH // 2, HEIGHT // 2, (255, 255, 255), 60, screen)
+
+        write("Press Esc to go back to the game", WIDTH // 2, 600, (255, 255, 255), 40, screen)
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+
+
+        pygame.display.update()
+        mainClock.tick(60)
 
 
 def solverSearchMethod(level, advanced):

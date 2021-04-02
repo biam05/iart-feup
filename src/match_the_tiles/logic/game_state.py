@@ -75,8 +75,6 @@ class CommonGameState:
         
         obstacles=[obstacleN,obstacleS,obstacleW,obstacleE]
         result=self.insert_vips(goals, walls, rows, cols,obstacles,finaldict,counter)
-        print(obstacles)
-        print(finaldict)
 
 
 
@@ -280,28 +278,37 @@ class GameState:
             local_moves = sys.maxsize
             block_x = block.coords.x
             block_y = block.coords.y
-            colinear_goals = filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals)
+            colinear_goals = list(filter(lambda el: el.color == block.color and (el.coords.x == block.coords.x or el.coords.y == block.coords.y), self.common_gs.goals))
             # colinear
-            if (colinear_goals):
+            print(colinear_goals)
+            print(len(colinear_goals))
+            if len(colinear_goals) != 0:
+                print(0)
                 for goal in colinear_goals:
                     goal_x = goal.coords.x
                     goal_y = goal.coords.y
                     if goal_x == block_x and goal_y == block_y:
                         local_moves = min(local_moves, 0)
+                        print(1)
                         break
                     obstacles = filter(lambda el: el != block and el.in_between(goal, block), self.blocks + self.common_gs.walls)
                     # has an obstacle between the block and the goal
                     if obstacles:
                         local_moves = min(local_moves, 3)
+                        print(2)
                     else:
+                        print(block_x, block_y, goal_x, goal_y)
                         if (goal_x == block_x and (goal_y == 0 or goal_y == self.common_gs.cols - 1)) or (goal_y == block_y and (goal_x == 0 or goal_x == self.common_gs.rows - 1)):
                             local_moves = min(local_moves, 1)
+                            print(3)
                         else:
                             obstacles = filter(lambda el: self.is_wall_stopping_block_at_goal(block, goal, el), self.common_gs.walls)
                             local_moves = min(local_moves, 1 if obstacles else 2)
+                            print(4)
             # non-colinear
             else:
                 local_moves = min(local_moves, 2)
+                print(5)
 
             moves = max(moves, local_moves)
         return moves
