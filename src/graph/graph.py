@@ -3,6 +3,8 @@ from collections import defaultdict
 from copy import deepcopy
 from queue import PriorityQueue
 
+import sys
+
 class Graph:
     """
     Constructor
@@ -73,8 +75,18 @@ class Graph:
         queue.append(node)
         visited[node.game_state] = True
 
+    @staticmethod
+    def __dfs(queue, node, visited):
+        if visited[node.game_state]:
+            return
+        queue.insert(0, node)
+        visited[node.game_state] = True
+
     def bfs(self, start):
         return self.__blind_search(start, self.__bfs)
+
+    def dfs(self, start):
+        return self.__blind_search(start, self.__dfs)
 
     """
     Performs a directed search using the algorithm specified
@@ -128,9 +140,8 @@ class Graph:
             if parent_node.game_state.move:
                 path.append(parent_node.game_state.move)
             parent_gs = parent_node.parent
-            if parent_gs == None:
+            if parent_gs is None:
                 break
             parent_node = self.nodes[parent_gs]
-            break
         path.reverse()
         return path

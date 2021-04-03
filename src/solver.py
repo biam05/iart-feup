@@ -5,6 +5,7 @@ from datetime import datetime
 
 algorithms = {
     "bfs": lambda graph, initial: graph.bfs(initial),
+    "dfs": lambda graph, initial: graph.dfs(initial),
 
     "ucs": lambda graph, initial: graph.uniform_cost_search(initial),
     "a-star": lambda graph, initial: graph.a_star(initial),
@@ -33,4 +34,4 @@ def solver(level_no, advanced, algorithm):
             len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             graph.expanded_nodes]
 
-print(solver(2, True, "a-star"))
+print(solver(2, False, "bfs"))
