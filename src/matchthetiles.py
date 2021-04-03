@@ -51,6 +51,8 @@ def getColor(color):
         return 255, 255, 0
     elif color == "p":
         return 255, 0, 127
+    elif color == "o":
+        return 255, 100, 0
     else:
         return 100, 100, 100
 
@@ -251,7 +253,6 @@ def play(level, advanced):
                         nr = gr.estimate_moves_left()
                         nu = gu.estimate_moves_left()
                         nd = gd.estimate_moves_left()
-                        print(nl, nr, nu, nd)
                         better = min(nl, nr, nu, nd)
                         if better == nl: hint("L")
                         elif better == nr: hint("R")
@@ -313,15 +314,18 @@ def solverSearchMethod(level, advanced):
         else:
             write("Level " + str(level), WIDTH // 2, 120, (255, 255, 255), 30, screen)
 
-        button_1 = pygame.Rect(135, 200, 430, 100)  # button to solver
-        button_2 = pygame.Rect(135, 350, 430, 100)  # button to play normal
-        button_3 = pygame.Rect(135, 500, 430, 100)  # button to play advanced
+        button_1 = pygame.Rect(135, 180, 430, 90)
+        button_2 = pygame.Rect(135, 300, 430, 90)
+        button_3 = pygame.Rect(135, 420, 430, 90)
+        button_4 = pygame.Rect(135, 540, 430, 90)
         pygame.draw.rect(screen, (0, 204, 255), button_1)
         pygame.draw.rect(screen, (0, 204, 255), button_2)
         pygame.draw.rect(screen, (0, 204, 255), button_3)
-        write("BFS", WIDTH // 2, 250, (0, 0, 0), 50, screen)
-        write("Uniform Cost Search", WIDTH // 2, 400, (0, 0, 0), 50, screen)
-        write("A*", WIDTH // 2, 550, (0, 0, 0), 50, screen)
+        pygame.draw.rect(screen, (0, 204, 255), button_4)
+        write("BFS", WIDTH // 2, 225, (0, 0, 0), 50, screen)
+        write("Uniform Cost Search", WIDTH // 2, 345, (0, 0, 0), 50, screen)
+        write("A*", WIDTH // 2, 465, (0, 0, 0), 50, screen)
+        write("Greedy", WIDTH // 2, 585, (0, 0, 0), 50, screen)
 
         if button_1.collidepoint((mx, my)):
             if click:
@@ -332,6 +336,9 @@ def solverSearchMethod(level, advanced):
         if button_3.collidepoint((mx, my)):
             if click:
                 solveLevel(level, advanced, "a-star")
+        if button_4.collidepoint((mx, my)):
+            if click:
+                solveLevel(level, advanced, "greedy")
 
         click = False
         for event in pygame.event.get():
@@ -361,7 +368,10 @@ def solveLevel(level, advanced, method):
         title = "Solver - BFS"
     elif method == "ucs":
         title = "Solver -  UCS"
+    elif method == "greedy":
+        title = "Solver -  Greedy"
     game_state = get_level(level, advanced)
+    print(game_state)
     while running:
         screen.fill((0, 0, 0))
         write(title, WIDTH // 2, 60, (255, 255, 255), 60, screen)
