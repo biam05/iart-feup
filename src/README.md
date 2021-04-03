@@ -8,6 +8,9 @@
 | Nuno Guilherme Amaral Santos            | up201405774 |
 | Telmo Alexandre Espírito Santo Baptista | up201806554 |
 
+## Dependencies
+
+
 ## How to Run
 
 Run the command `python matchthetiles.py` inside the folder `src` and a menu should be displayed.
