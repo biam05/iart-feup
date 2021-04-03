@@ -3,43 +3,37 @@ from collections import defaultdict
 from copy import deepcopy
 from queue import PriorityQueue
 
-import sys
 
 class Graph:
     """
     Constructor
     - 
     """
+
     def __init__(self, gamestate):
         self.graph = defaultdict(list)
-        #self.nodes = defaultdict(Node)
-        #self.nodes.default_factory = lambda: None
         self.initial = gamestate
         self.expanded_nodes = 0
 
     def add_edge(self, source, dest, current_path, heuristics=False, nodecost=True):
-        #node = self.nodes[dest]
-        #if node is None:
         path = deepcopy(current_path)
         path.append(dest.move)
         node = Node(dest, path=path, parent=source, use_heuristic=heuristics, nodecost=nodecost)
-        #    self.nodes[dest] = node
         self.graph[source].append(node)
         return node
-    
-    def get_edges(self, node):
-        edges = []
-        edges.append(node.game_state.swipe_left())
-        edges.append(node.game_state.swipe_right())
-        edges.append(node.game_state.swipe_up())
-        edges.append(node.game_state.swipe_down())
+
+    @staticmethod
+    def get_edges(node):
+        edges = [node.game_state.swipe_left(), node.game_state.swipe_right(), node.game_state.swipe_up(),
+                 node.game_state.swipe_down()]
         return edges
-    
+
     """
     Performs a blind search using the algorithm specified
     - GameState start : startinga GameState
     - Function algorithm : Function that decides which node to expand next
     """
+
     def __blind_search(self, start, algorithm):
         visited = defaultdict(bool)
 
@@ -60,7 +54,7 @@ class Graph:
 
             for edge in self.get_edges(current):
                 node = self.add_edge(current.game_state, edge, current.path)
-                
+
                 algorithm(queue, node, visited)
 
         return None
@@ -90,6 +84,7 @@ class Graph:
     - GameState start : starting GameState
     - Function algorithm : Function that decides which node to expand next
     """
+
     def __directed_search(self, start, heuristics=False, nodecost=True):
         visited = defaultdict(bool)
 
@@ -116,7 +111,7 @@ class Graph:
                 visited[node.game_state] = True
 
         return None
-    
+
     def uniform_cost_search(self, start):
         return self.__directed_search(start, heuristics=False, nodecost=True)
 
@@ -125,21 +120,3 @@ class Graph:
 
     def greedy(self, start):
         return self.__directed_search(start, heuristics=True, nodecost=False)
-
-    """def rebuild_path(self, node):
-        path = list()
-        if node.game_state.move:
-            path.append(node.game_state.move)
-        parent_gs = node.parent
-        parent_node = self.nodes[parent_gs]
-
-        while parent_node:
-            if parent_node.game_state.move:
-                path.append(parent_node.game_state.move)
-            parent_gs = parent_node.parent
-            if parent_gs is None:
-                break
-            parent_node = self.nodes[parent_gs]
-        path.reverse()
-        return path
-    """
