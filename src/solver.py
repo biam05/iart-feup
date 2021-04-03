@@ -30,5 +30,3 @@ def solver(level_no, advanced, algorithm):
     return [algorithm, elapsed_time.total_seconds(), end_node.path,
             len(end_node.path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             graph.expanded_nodes]
-
-print(solver(15, True, "dfs"))
