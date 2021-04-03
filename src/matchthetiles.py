@@ -22,6 +22,7 @@ def scrollX(screenSurf, offsetX):
     else:
         screenSurf.blit(copySurf, (0, 0), (width - offsetX, 0, offsetX, height))
 
+
 def scrollY(screenSurf, offsetY):
     width, height = screenSurf.get_size()
     copySurf = screenSurf.copy()
@@ -31,11 +32,12 @@ def scrollY(screenSurf, offsetY):
     else:
         screenSurf.blit(copySurf, (0, 0), (0, height - offsetY, width, offsetY))
 
-def write(text, x, y, color, size, screen):
+
+def write(text, x, y, color, size, surface):
     font = pygame.font.SysFont("Arial", size)
     text = font.render(text, True, pygame.Color(color))
     text_rect = text.get_rect(center=(x, y))
-    screen.blit(text, text_rect)
+    surface.blit(text, text_rect)
 
 
 def getColor(color):
@@ -260,10 +262,14 @@ def play(level, advanced):
                         nu = gu.estimate_moves_left()
                         nd = gd.estimate_moves_left()
                         better = min(nl, nr, nu, nd)
-                        if better == nl: hint("L")
-                        elif better == nr: hint("R")
-                        elif better == nu: hint("U")
-                        elif better == nd: hint("D")
+                        if better == nl:
+                            hint("L")
+                        elif better == nr:
+                            hint("R")
+                        elif better == nu:
+                            hint("U")
+                        elif better == nd:
+                            hint("D")
                     if ngame_state != game_state:
                         nmoves = nmoves + 1
                     game_state = ngame_state
@@ -285,11 +291,14 @@ def hint(direction):
 
         write("Hint", WIDTH // 2, 60, (255, 255, 255), 60, screen)
 
-        if direction == "R": hint = "Swipe Right"
-        elif direction == "L": hint = "Swipe Left"
-        elif direction == "U": hint = "Swipe Up"
-        elif direction == "D": hint = "Swipe Down"
-
+        if direction == "R":
+            hint = "Swipe Right"
+        elif direction == "L":
+            hint = "Swipe Left"
+        elif direction == "U":
+            hint = "Swipe Up"
+        elif direction == "D":
+            hint = "Swipe Down"
 
         write(hint, WIDTH // 2, HEIGHT // 2, (255, 255, 255), 60, screen)
 
@@ -302,7 +311,6 @@ def hint(direction):
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False
-
 
         pygame.display.update()
         mainClock.tick(60)
