@@ -200,26 +200,32 @@ def play(level, advanced):
     finishedGame = False
     next = False
     restart = False
+    no_more_levels = False
     game_state = get_level(level, advanced)
+    if not game_state:
+        no_more_levels = True
     while running:
         screen.fill((0, 0, 0))
-        if advanced:
-            write("Level " + level + " Advanced", WIDTH // 2, 60, (255, 255, 255), 60, screen)
+        if no_more_levels:
+            write("No More Levels", WIDTH // 2, HEIGHT // 2, (255, 255, 255), 60, screen)
         else:
-            write("Level " + level, WIDTH // 2, 60, (255, 255, 255), 60, screen)
-        write("Number of Moves: " + str(nmoves), WIDTH // 2, 120, (255, 255, 255), 30, screen)
-        drawboard(game_state)
-        if game_state.is_game_over():
-            finishedGame = True
-        if finishedGame:
             if advanced:
-                write("Finished level " + level + " Advanced!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
+                write("Level " + level + " Advanced", WIDTH // 2, 60, (255, 255, 255), 60, screen)
             else:
-                write("Finished level " + level + "!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
-            write("Press Y to Play next Level or R to Restart", WIDTH // 2, 660, (255, 255, 255), 30, screen)
-        else:
-            write("Move: Arrow Keys", WIDTH // 2, 600, (255, 255, 255), 40, screen)
-            write("Restart: R    Hint: H", WIDTH // 2, 650, (255, 255, 255), 30, screen)
+                write("Level " + level, WIDTH // 2, 60, (255, 255, 255), 60, screen)
+            write("Number of Moves: " + str(nmoves), WIDTH // 2, 120, (255, 255, 255), 30, screen)
+            drawboard(game_state)
+            if game_state.is_game_over():
+                finishedGame = True
+            if finishedGame:
+                if advanced:
+                    write("Finished level " + level + " Advanced!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
+                else:
+                    write("Finished level " + level + "!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
+                write("Press Y to Play next Level or R to Restart", WIDTH // 2, 660, (255, 255, 255), 30, screen)
+            else:
+                write("Move: Arrow Keys", WIDTH // 2, 600, (255, 255, 255), 40, screen)
+                write("Restart: R    Hint: H", WIDTH // 2, 650, (255, 255, 255), 30, screen)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
