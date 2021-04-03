@@ -23,7 +23,7 @@ heuristics = [
     HeuristicOptions(estimate_moves=False, collisions=False, euc_dist=False, man_dist=True, dist_func=np.mean, node_func=np.mean),
     HeuristicOptions(estimate_moves=True, collisions=False, euc_dist=True, man_dist=False, dist_func=np.mean, node_func=np.mean),
     HeuristicOptions(estimate_moves=True, collisions=False, euc_dist=False, man_dist=True, dist_func=np.mean, node_func=np.mean),
-    HeuristicOptions(estimate_moves=True, collisions=False, euc_dist=False, man_dist=True, dist_func=min, node_func=min),
+    HeuristicOptions(estimate_moves=True, collisions=False, euc_dist=True, man_dist=False, dist_func=min, node_func=min),
     HeuristicOptions(estimate_moves=True, collisions=False, euc_dist=False, man_dist=True, dist_func=min, node_func=min)
 ]
 
