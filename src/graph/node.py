@@ -32,5 +32,5 @@ class Node:
         if self.nodecost:
             result += self.game_state.eval_game_state()
         if self.use_heuristic:
-            result += self.game_state.estimate_moves_left()
+            result += self.game_state.estimate_moves_left() + self.game_state.choose_path()
         return result

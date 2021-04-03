@@ -4,6 +4,7 @@ from match_the_tiles.model.tile_data import WallData, BlockData, GoalData
 from utils.utils import Coords
 from utils.utils import CoordswithColor
 import itertools
+import math
 
 from enum import Enum
 import sys
@@ -99,7 +100,7 @@ class CommonGameState:
         new_S_walls=[]
         
         for wall in obstacles[0]:#N
-            E_walls=list(filter(lambda el: el[1] == wall[1]+1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(2,walls,el,wall), walls))#0 for horizontal right, 1 for horizontal left, 2 for vertical up, 3 for vertical down
+            E_walls=list(filter(lambda el: el[1] == wall[1]+1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(2,walls,el,wall), walls))
             W_walls=list(filter(lambda el: el[1] == wall[1]-1 and el[0] > wall[0] and self.is_it_a_plane_is_it_a_bird_no_its_a_wall(2,walls,el,wall), walls))
             new_E_walls.extend(E_walls)
             new_W_walls.extend(W_walls)
@@ -332,6 +333,19 @@ class GameState:
 
             moves = max(moves, local_moves)
         return moves
+
+    def euclidean_distance(self, dist_func, node_func):
+        dists = []
+        for block in self.blocks:
+            node_dists = []
+            for goal in self.common_gs.goals:
+                if block.color == goal.color:
+                    # d = sqrt((x2-x1)**2 + (y2-y1)**2)
+                    dnode = math.sqrt(math.pow(block.coords.x - goal.coords.x, 2) + math.pow(block.coords.y - goal.coords.y, 2))
+                    node_dists.append(dnode)
+            d = node_func(node_dists)
+            dists.append(d)
+        return dist_func(dists)
 
 
     def choose_path(self):
