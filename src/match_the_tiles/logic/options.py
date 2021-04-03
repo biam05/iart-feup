@@ -5,7 +5,7 @@ from typing import Callable
 class HeuristicOptions:
     estimate_moves : bool = True
     collisions : bool = False
-    euc_dist : bool = False
+    euc_dist : bool = True
     man_dist : bool = False
     dist_func : Callable[[list], float] = min
     node_func : Callable[[list], float] = min
