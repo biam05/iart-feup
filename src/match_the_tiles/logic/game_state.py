@@ -449,7 +449,7 @@ class GameState:
 
     def __eq__(self, other):
         self_blocks = sorted(self.blocks, key=lambda el: (el.coords.x, el.coords.y))
-        other_blocks = sorted(self.blocks, key=lambda el: (el.coords.x, el.coords.y))
+        other_blocks = sorted(other.blocks, key=lambda el: (el.coords.x, el.coords.y))
         return all(map(lambda x, y: x == y, self_blocks, other_blocks))
 
     def __hash__(self):

@@ -371,7 +371,6 @@ def solveLevel(level, advanced, method):
     elif method == "greedy":
         title = "Solver -  Greedy"
     game_state = get_level(level, advanced)
-    print(game_state)
     while running:
         screen.fill((0, 0, 0))
         write(title, WIDTH // 2, 60, (255, 255, 255), 60, screen)

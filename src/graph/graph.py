@@ -119,16 +119,17 @@ class Graph:
 
     def rebuild_path(self, node):
         path = list()
-        if (node.game_state.move):
+        if node.game_state.move:
             path.append(node.game_state.move)
         parent_gs = node.parent
         parent_node = self.nodes[parent_gs]
 
         while parent_node:
-            if (parent_node.game_state.move):
+            if parent_node.game_state.move:
                 path.append(parent_node.game_state.move)
             parent_gs = parent_node.parent
-            if (parent_gs == None):
+            print("Parent_GS:" + str(parent_gs))
+            if parent_gs == None:
                 break
             parent_node = self.nodes[parent_gs]
         path.reverse()
