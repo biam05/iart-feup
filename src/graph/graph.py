@@ -22,7 +22,7 @@ class Graph:
     """
     def add_edge(self, source, dest, heuristics=False):
         node = self.nodes[dest]
-        if not self.nodes[dest]:
+        if not node:
             node = Node(dest, parent=source, use_heuristic=heuristics)
             self.nodes[dest] = node
         self.graph[source].append(node)
@@ -121,10 +121,12 @@ class Graph:
         parent_gs = node.parent
         parent_node = self.nodes[parent_gs]
 
-        while parent_node:
+        while True:
             if (parent_node.game_state.move):
                 path.append(parent_node.game_state.move)
             parent_gs = parent_node.parent
+            if (parent_gs == None):
+                break
             parent_node = self.nodes[parent_gs]
         path.reverse()
         return path

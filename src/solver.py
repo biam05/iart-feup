@@ -17,7 +17,6 @@ def solver(level_no, advanced, algorithm):
     start_time = datetime.now()
     
     end_node = algorithms[algorithm](graph, game_state)
-
     end_time = datetime.now()
 
     path = graph.rebuild_path(end_node)
@@ -28,5 +27,5 @@ def solver(level_no, advanced, algorithm):
             len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             graph.expanded_nodes]
 
-print(solver(1, False, "bfs"))
+print(solver(2, False, "ucs"))
 

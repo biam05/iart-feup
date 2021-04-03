@@ -26,6 +26,9 @@ class BlockData:
     def __eq__(self, other):
         return self.coords == other.coords and self.color == other.color
 
+    def __hash__(self):
+        return hash((self.coords, self.color))
+
 class GoalData:
     """
     Constructor

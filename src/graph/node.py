@@ -26,4 +26,4 @@ class Node:
 
         Returns the value of the node
         """
-        return self.game_state.eval_game_state() + self.game_state.estimate_moves_left() + self.game_state.choose_path() if self.use_heuristic else 0
+        return self.game_state.eval_game_state() + self.game_state.estimate_moves_left() if self.use_heuristic else 0
