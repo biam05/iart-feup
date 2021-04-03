@@ -35,5 +35,5 @@ def read_file(file_name):
         x += 1
 
     commonGameState = CommonGameState(walls, goals, rows, cols)
-    commonGameState.get_goal_surrouding_walls(rows,cols,walls,goals)
+    commonGameState.get_goal_surrounding_walls(rows, cols, walls, goals)
     return GameState(commonGameState, blocks)
