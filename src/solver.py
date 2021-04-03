@@ -21,17 +21,14 @@ def solver(level_no, advanced, algorithm):
     end_node = algorithms[algorithm](graph, game_state)
     end_time = datetime.now()
 
-    path = []
-    if end_node:
-        path = graph.rebuild_path(end_node)
-    else:
+    if not end_node:
         print("No Solution")
         return
 
     elapsed_time = end_time-start_time
 
-    return [algorithm, elapsed_time.total_seconds(), path,
-            len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
+    return [algorithm, elapsed_time.total_seconds(), end_node.path,
+            len(end_node.path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             graph.expanded_nodes]
 
 print(solver(15, True, "dfs"))

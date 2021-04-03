@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, game_state, parent=None, use_heuristic=False, nodecost=True):
+    def __init__(self, game_state, path=None, parent=None, use_heuristic=False, nodecost=True):
         """
         Constructor
         - GameState game_state  : current game_state
@@ -12,6 +12,9 @@ class Node:
         self.parent = parent
         self.use_heuristic = use_heuristic
         self.nodecost = nodecost
+        self.path = []
+        if path:
+            self.path = path
 
     def __lt__(self, other):
         """

@@ -12,21 +12,18 @@ class Graph:
     """
     def __init__(self, gamestate):
         self.graph = defaultdict(list)
-        self.nodes = defaultdict(Node)
-        self.nodes.default_factory = lambda: None
+        #self.nodes = defaultdict(Node)
+        #self.nodes.default_factory = lambda: None
         self.initial = gamestate
         self.expanded_nodes = 0
 
-    """
-    Adds edge from the source node to dest node
-    - Node source   : parent node
-    - Node dest     : child node
-    """
-    def add_edge(self, source, dest, heuristics=False, nodecost=True):
-        node = self.nodes[dest]
-        if node is None:
-            node = Node(dest, parent=source, use_heuristic=heuristics, nodecost=nodecost)
-            self.nodes[dest] = node
+    def add_edge(self, source, dest, current_path, heuristics=False, nodecost=True):
+        #node = self.nodes[dest]
+        #if node is None:
+        path = deepcopy(current_path)
+        path.append(dest.move)
+        node = Node(dest, path=path, parent=source, use_heuristic=heuristics, nodecost=nodecost)
+        #    self.nodes[dest] = node
         self.graph[source].append(node)
         return node
     
@@ -62,7 +59,7 @@ class Graph:
                 return current
 
             for edge in self.get_edges(current):
-                node = self.add_edge(current.game_state, edge)
+                node = self.add_edge(current.game_state, edge, current.path)
                 
                 algorithm(queue, node, visited)
 
@@ -111,7 +108,7 @@ class Graph:
                 return current
 
             for edge in self.get_edges(current):
-                node = self.add_edge(current.game_state, edge, heuristics=heuristics, nodecost=nodecost)
+                node = self.add_edge(current.game_state, edge, current.path, heuristics=heuristics, nodecost=nodecost)
 
                 if visited[node.game_state]:
                     continue
@@ -129,7 +126,7 @@ class Graph:
     def greedy(self, start):
         return self.__directed_search(start, heuristics=True, nodecost=False)
 
-    def rebuild_path(self, node):
+    """def rebuild_path(self, node):
         path = list()
         if node.game_state.move:
             path.append(node.game_state.move)
@@ -145,3 +142,4 @@ class Graph:
             parent_node = self.nodes[parent_gs]
         path.reverse()
         return path
+    """
