@@ -7,7 +7,8 @@ algorithms = {
     "bfs": lambda graph, initial: graph.bfs(initial),
 
     "ucs": lambda graph, initial: graph.uniform_cost_search(initial),
-    "a-star": lambda graph, initial: graph.a_star(initial)
+    "a-star": lambda graph, initial: graph.a_star(initial),
+    "greedy": lambda graph, initial: graph.greedy(initial)
 }
 
 def solver(level_no, advanced, algorithm):

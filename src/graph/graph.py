@@ -20,10 +20,10 @@ class Graph:
     - Node source   : parent node
     - Node dest     : child node
     """
-    def add_edge(self, source, dest, heuristics=False):
+    def add_edge(self, source, dest, heuristics=False, nodecost=True):
         node = self.nodes[dest]
         if not node:
-            node = Node(dest, parent=source, use_heuristic=heuristics)
+            node = Node(dest, parent=source, use_heuristic=heuristics, nodecost=nodecost)
             self.nodes[dest] = node
         self.graph[source].append(node)
         return node
@@ -78,14 +78,14 @@ class Graph:
 
     """
     Performs a directed search using the algorithm specified
-    - GameState start : startinga GameState
+    - GameState start : starting GameState
     - Function algorithm : Function that decides which node to expand next
     """
-    def __directed_search(self, start, heuristics=False):
+    def __directed_search(self, start, heuristics=False, nodecost=True):
         visited = defaultdict(bool)
 
         queue = PriorityQueue()
-        queue.put(Node(start, use_heuristic=heuristics))
+        queue.put(Node(start, use_heuristic=heuristics, nodecost=nodecost))
 
         visited[start] = True
         self.expanded_nodes = 0
@@ -99,7 +99,7 @@ class Graph:
                 return current
 
             for edge in self.get_edges(current):
-                node = self.add_edge(current.game_state, edge, heuristics=heuristics)
+                node = self.add_edge(current.game_state, edge, heuristics=heuristics, nodecost=nodecost)
 
                 if visited[node.game_state]:
                     continue
@@ -109,23 +109,27 @@ class Graph:
         return None
     
     def uniform_cost_search(self, start):
-        return self.__directed_search(start, heuristics=False)
+        return self.__directed_search(start, heuristics=False, nodecost=True)
 
     def a_star(self, start):
-        return self.__directed_search(start, heuristics=True)
+        return self.__directed_search(start, heuristics=True, nodecost=True)
+
+    def greedy(self, start):
+        return self.__directed_search(start, heuristics=True, nodecost=False)
 
     def rebuild_path(self, node):
         path = list()
-        if (node.game_state.move):
+        if node.game_state.move:
             path.append(node.game_state.move)
         parent_gs = node.parent
         parent_node = self.nodes[parent_gs]
 
-        while True:
-            if (parent_node.game_state.move):
+        while parent_node:
+            if parent_node.game_state.move:
                 path.append(parent_node.game_state.move)
             parent_gs = parent_node.parent
-            if (parent_gs == None):
+            print("Parent_GS:" + str(parent_gs))
+            if parent_gs == None:
                 break
             parent_node = self.nodes[parent_gs]
         path.reverse()
