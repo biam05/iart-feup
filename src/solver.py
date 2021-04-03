@@ -33,5 +33,4 @@ def solver(level_no, advanced, algorithm):
             len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             graph.expanded_nodes]
 
-print(bool(None))
-print(solver(1, True, "a-star"))
+print(solver(2, True, "a-star"))
