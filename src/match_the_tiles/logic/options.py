@@ -4,21 +4,12 @@ from typing import Callable
 
 @dataclass
 class HeuristicOptions:
-<<<<<<< HEAD
     estimate_moves : bool = True
     collisions : bool = False
     euc_dist : bool = True
     man_dist : bool = False
     dist_func : Callable[[list], float] = min
     node_func : Callable[[list], float] = min
-=======
-    estimate_moves: bool = True
-    collisions: bool = False
-    euc_dist: bool = False
-    man_dist: bool = False
-    dist_func: Callable[[list], float] = min
-    node_func: Callable[[list], float] = min
->>>>>>> cbe990c6cedb7d199829bf188d4b6b973530d212
 
     def __str__(self):
         value = []
