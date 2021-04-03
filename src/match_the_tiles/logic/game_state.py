@@ -49,7 +49,9 @@ class CommonGameState:
         self.cols = cols
         self.proccessdict = {}
         self.allWalls = walls
-
+    """
+    addExtraWalls adds the borders of the board as walls to then calculate colisions with blocks
+    """
     @staticmethod
     def addExtraWalls(walls, cols, rows):
         i = 0
@@ -59,7 +61,10 @@ class CommonGameState:
             extrawalls.extend([[i, -1], [i, rows]])
             i = i + 1
         return extrawalls
-
+    """
+    get_goal_surrouding_walls returns a dictionary with the values of the walls which are needed to 
+    colide with to reach the goal(value increases the more orientation changes it takes to reach it from goal)
+    """
     def get_goal_surrounding_walls(self, rows, cols, defaultwalls, goals):
         counter = 1
         finaldict = {}
@@ -94,7 +99,10 @@ class CommonGameState:
             finaldict = self.insert_vips(goal, walls, rows, cols, obstacles, finaldict, counter)
         self.proccessdict = finaldict
         self.allWalls = self.addExtraWalls(defaultwalls, cols, rows)
-
+    """
+    insert_vips is the recursive function to fill the dictionary with the remaining walls
+    receives the obstacles already calculated in get_goal_surrounding_walls and calculates the remaining from those
+    """
     def insert_vips(self, goal, walls, rows, cols, obstacles, finaldict, counter):
         new_E_walls = []
         new_W_walls = []
@@ -173,7 +181,12 @@ class CommonGameState:
 
         result = self.insert_vips(goal, walls, rows, cols, obstacles, finaldict, counter)
         return result
-
+    """
+    updateDict updates the dictionary with the wall given
+    orientation: N,S,E,W (values:0,1,2,3)
+    finaldict: final dictionary
+    counter: value to add to dictionary on wall
+    """
     @staticmethod
     def updateDict(orientation, finaldict, counter, x, y, goal):
         coord = CoordswithColor(x, y, goal)
@@ -182,6 +195,14 @@ class CommonGameState:
         finaldict.update({coord: previous})
         return finaldict
 
+    """
+    stop_when_obstacle_found returns a boolean
+    it is meant to order to stop finding walls for insert_vips if a obstacle is met
+    orientation: N,S,E,W (values:0,1,2,3)
+    walls: walls
+    element: element to add to dictionary
+    chosen wall: origin from which search began
+    """
     @staticmethod
     def stop_when_obstacle_found(orientation, walls, element, chosenwall):
         for wall in walls:
@@ -415,7 +436,9 @@ class GameState:
                 d = sys.maxsize
             dists.append(d)
         return dist_func(dists)
-
+    """
+    Calculates the value of the wall the block collided with using dictionary filled on pre-processing
+    """
     def choose_path(self):
         value = [sys.maxsize, sys.maxsize, sys.maxsize, sys.maxsize]
         walls = self.common_gs.allWalls
