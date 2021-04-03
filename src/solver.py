@@ -26,7 +26,7 @@ def solver(level_no, advanced, algorithm):
 
     return [algorithm, elapsed_time.total_seconds(), path,
             len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
-            2]
+            graph.expanded_nodes]
 
-solver(16, True, "bfs")
+print(solver(1, False, "bfs"))
 

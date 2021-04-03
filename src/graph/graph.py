@@ -13,6 +13,7 @@ class Graph:
         self.nodes = defaultdict(Node)
         self.nodes.default_factory = lambda: None
         self.initial = gamestate
+        self.expanded_nodes = 0
 
     """
     Adds edge from the source node to dest node
@@ -48,12 +49,12 @@ class Graph:
 
         visited[start] = True
 
-        # file = open("debug.txt", 'w+')
+        self.expanded_nodes = 0
 
         while queue:
             current = queue.pop(0)
 
-            # file.write(f"Depth Level {current.game_state.nMoves}: {current.game_state.blocks} - Originated from {current.game_state.move} - Parent Gamestate {current.parent.blocks if current.parent else 'Initial'}\n")
+            self.expanded_nodes += 1
 
             if current.game_state.is_game_over():
                 return current
@@ -87,9 +88,12 @@ class Graph:
         queue.put(Node(start, use_heuristic=heuristics))
 
         visited[start] = True
+        self.expanded_nodes = 0
 
         while queue:
             current = queue.get()
+
+            self.expanded_nodes += 1
 
             if current.game_state.is_game_over():
                 return current
