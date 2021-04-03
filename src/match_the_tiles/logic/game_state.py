@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 from match_the_tiles.model.tile_data import WallData, BlockData, GoalData
+from match_the_tiles.logic.options import HeuristicOptions
 from utils.utils import Coords
 from utils.utils import CoordswithColor
 import itertools
@@ -193,7 +194,7 @@ class GameState:
     - Move move : Move that originated GameState, None if initial
     - Int nMoves : Number of moves since initial state
     """
-    def __init__(self, common_gs, blocks, move=None, nMoves=0):
+    def __init__(self, common_gs, blocks, move=None, nMoves=0, options=HeuristicOptions()):
         self.common_gs = common_gs
         self.blocks = list()
         for block in blocks:
@@ -201,6 +202,7 @@ class GameState:
         self.move = move
         self.nMoves = nMoves
         self.points = -1
+        self.options = options
     
     def __repr__(self):
         out = ""
@@ -295,6 +297,19 @@ class GameState:
                 return True
         return False
 
+    def calc_heuristic(self):
+        value = 0
+        if (self.options.estimate_moves):
+            value += self.estimate_moves_left()
+        if (self.options.collisions):
+            value += self.choose_path()
+        if (self.options.euc_dist):
+            value += self.euclidean_distance(self.options.dist_func, self.options.node_func)
+        if (self.options.man_dist):
+            value += self.manhattan_distance(self.options.dist_func, self.options.node_func)
+        
+        return value
+
     """
     Estimates the number of moves needed to finish the game from a GameState
 
@@ -343,7 +358,26 @@ class GameState:
                     # d = sqrt((x2-x1)**2 + (y2-y1)**2)
                     dnode = math.sqrt(math.pow(block.coords.x - goal.coords.x, 2) + math.pow(block.coords.y - goal.coords.y, 2))
                     node_dists.append(dnode)
-            d = node_func(node_dists)
+            if node_dists:
+                d = node_func(node_dists)
+            else:
+                d = sys.maxsize
+            dists.append(d)
+        return dist_func(dists)
+
+    def manhattan_distance(self, dist_func, node_func):
+        dists = []
+        for block in self.blocks:
+            node_dists = []
+            for goal in self.common_gs.goals:
+                if block.color == goal.color:
+                    # d = abs(x1-x2) + abs(y1-y2)
+                    dnode = abs(block.coords.x - goal.coords.x) + abs(block.coords.y - goal.coords.y)
+                    node_dists.append(dnode)
+            if node_dists:
+                d = node_func(node_dists)
+            else:
+                d = sys.maxsize
             dists.append(d)
         return dist_func(dists)
 
@@ -396,7 +430,7 @@ class GameState:
             new_col = walls[0].coords.y + 1 if walls else 0
             new_blocks[i].coords.setY(new_col)
         
-        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_LEFT, nMoves=(self.nMoves + 1))
+        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_LEFT, nMoves=(self.nMoves + 1), options=self.options)
 
     """
     Swipe Right Operation - Moves the movable blocks in the GameState to the right
@@ -412,7 +446,7 @@ class GameState:
             new_col = walls[0].coords.y - 1 if walls else (self.common_gs.cols - 1)
             new_blocks[i].coords.setY(new_col)
         
-        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_RIGHT, nMoves=(self.nMoves + 1))
+        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_RIGHT, nMoves=(self.nMoves + 1), options=self.options)
 
     """
     Swipe Up Operation - Moves the movable blocks in the GameState upwards
@@ -427,7 +461,7 @@ class GameState:
             walls = sorted(filter(lambda el: el.coords.y == block.coords.y and el.coords.x < block.coords.x, new_blocks[:i] + self.common_gs.walls), key=lambda el: -el.coords.x)
             new_row = walls[0].coords.x + 1 if walls else 0
             new_blocks[i].coords.setX(new_row)
-        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_UP, nMoves=(self.nMoves + 1))
+        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_UP, nMoves=(self.nMoves + 1), options=self.options)
 
     """
     Swipe Down Operation - Moves the movable blocks in the GameState downwards
@@ -443,7 +477,7 @@ class GameState:
             new_row = walls[0].coords.x - 1 if walls else (self.common_gs.rows - 1)
             new_blocks[i].coords.setX(new_row)
         
-        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_DOWN, nMoves=(self.nMoves + 1))
+        return GameState(self.common_gs, self.blocks_as_list(new_blocks), move=Move.SWIPE_DOWN, nMoves=(self.nMoves + 1), options=self.options)
 
     """
     Checks if game state is in final state, each block must match in one goal

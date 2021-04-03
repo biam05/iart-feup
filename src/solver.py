@@ -1,5 +1,6 @@
 from match_the_tiles.logic.reader import get_level, read_file
 from graph.graph import Graph
+from match_the_tiles.logic.options import HeuristicOptions
 
 from datetime import datetime
 
@@ -12,8 +13,9 @@ algorithms = {
     "greedy": lambda graph, initial: graph.greedy(initial)
 }
 
-def solver(level_no, advanced, algorithm):
+def solver(level_no, advanced, algorithm, options=HeuristicOptions()):
     game_state = get_level(level_no, advanced=advanced)
+    game_state.options = options
 
     graph = Graph(game_state)
     start_time = datetime.now()
