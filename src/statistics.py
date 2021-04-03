@@ -70,5 +70,5 @@ def run_heuristics():
         run_heuristic(options)
 
 if __name__ == "__main__":
-    #run_algorithms()
+    run_algorithms()
     run_heuristics()
