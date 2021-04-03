@@ -200,26 +200,32 @@ def play(level, advanced):
     finishedGame = False
     next = False
     restart = False
+    no_more_levels = False
     game_state = get_level(level, advanced)
+    if not game_state:
+        no_more_levels = True
     while running:
         screen.fill((0, 0, 0))
-        if advanced:
-            write("Level " + level + " Advanced", WIDTH // 2, 60, (255, 255, 255), 60, screen)
+        if no_more_levels:
+            write("No More Levels", WIDTH // 2, HEIGHT // 2, (255, 255, 255), 60, screen)
         else:
-            write("Level " + level, WIDTH // 2, 60, (255, 255, 255), 60, screen)
-        write("Number of Moves: " + str(nmoves), WIDTH // 2, 120, (255, 255, 255), 30, screen)
-        drawboard(game_state)
-        if game_state.is_game_over():
-            finishedGame = True
-        if finishedGame:
             if advanced:
-                write("Finished level " + level + " Advanced!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
+                write("Level " + level + " Advanced", WIDTH // 2, 60, (255, 255, 255), 60, screen)
             else:
-                write("Finished level " + level + "!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
-            write("Press Y to Play next Level or R to Restart", WIDTH // 2, 660, (255, 255, 255), 30, screen)
-        else:
-            write("Move: Arrow Keys", WIDTH // 2, 600, (255, 255, 255), 40, screen)
-            write("Restart: R    Hint: H", WIDTH // 2, 650, (255, 255, 255), 30, screen)
+                write("Level " + level, WIDTH // 2, 60, (255, 255, 255), 60, screen)
+            write("Number of Moves: " + str(nmoves), WIDTH // 2, 120, (255, 255, 255), 30, screen)
+            drawboard(game_state)
+            if game_state.is_game_over():
+                finishedGame = True
+            if finishedGame:
+                if advanced:
+                    write("Finished level " + level + " Advanced!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
+                else:
+                    write("Finished level " + level + "!", WIDTH // 2, 600, (255, 255, 255), 50, screen)
+                write("Press Y to Play next Level or R to Restart", WIDTH // 2, 660, (255, 255, 255), 30, screen)
+            else:
+                write("Move: Arrow Keys", WIDTH // 2, 600, (255, 255, 255), 40, screen)
+                write("Restart: R    Hint: H", WIDTH // 2, 650, (255, 255, 255), 30, screen)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -314,29 +320,35 @@ def solverSearchMethod(level, advanced):
         else:
             write("Level " + str(level), WIDTH // 2, 120, (255, 255, 255), 30, screen)
 
-        button_1 = pygame.Rect(135, 180, 430, 90)
-        button_2 = pygame.Rect(135, 300, 430, 90)
-        button_3 = pygame.Rect(135, 420, 430, 90)
-        button_4 = pygame.Rect(135, 540, 430, 90)
+        button_1 = pygame.Rect(135, 160, 430, 90)
+        button_2 = pygame.Rect(135, 260, 430, 90)
+        button_3 = pygame.Rect(135, 360, 430, 90)
+        button_4 = pygame.Rect(135, 460, 430, 90)
+        button_5 = pygame.Rect(135, 560, 430, 90)
         pygame.draw.rect(screen, (0, 204, 255), button_1)
         pygame.draw.rect(screen, (0, 204, 255), button_2)
         pygame.draw.rect(screen, (0, 204, 255), button_3)
         pygame.draw.rect(screen, (0, 204, 255), button_4)
-        write("BFS", WIDTH // 2, 225, (0, 0, 0), 50, screen)
-        write("Uniform Cost Search", WIDTH // 2, 345, (0, 0, 0), 50, screen)
-        write("A*", WIDTH // 2, 465, (0, 0, 0), 50, screen)
-        write("Greedy", WIDTH // 2, 585, (0, 0, 0), 50, screen)
+        pygame.draw.rect(screen, (0, 204, 255), button_5)
+        write("BFS", WIDTH // 2, 205, (0, 0, 0), 50, screen)
+        write("DFS", WIDTH // 2, 305, (0, 0, 0), 50, screen)
+        write("Uniform Cost Search", WIDTH // 2, 405, (0, 0, 0), 50, screen)
+        write("A*", WIDTH // 2, 505, (0, 0, 0), 50, screen)
+        write("Greedy", WIDTH // 2, 605, (0, 0, 0), 50, screen)
 
         if button_1.collidepoint((mx, my)):
             if click:
                 solveLevel(level, advanced, "bfs")
         if button_2.collidepoint((mx, my)):
             if click:
-                solveLevel(level, advanced, "ucs")
+                solveLevel(level, advanced, "dfs")
         if button_3.collidepoint((mx, my)):
             if click:
-                solveLevel(level, advanced, "a-star")
+                solveLevel(level, advanced, "ucs")
         if button_4.collidepoint((mx, my)):
+            if click:
+                solveLevel(level, advanced, "a-star")
+        if button_5.collidepoint((mx, my)):
             if click:
                 solveLevel(level, advanced, "greedy")
 
@@ -366,6 +378,8 @@ def solveLevel(level, advanced, method):
         title = "Solver - A*"
     elif method == "bfs":
         title = "Solver - BFS"
+    elif method == "dfs":
+        title = "Solver - DFS"
     elif method == "ucs":
         title = "Solver -  UCS"
     elif method == "greedy":

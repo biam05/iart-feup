@@ -6,9 +6,12 @@ def get_level(level_no, advanced=False):
     game_state = read_file(file_name)
     return game_state
 
-def read_file(file_name):
-
-    file = open(file_name, 'r')
+def read_file(file_name):           
+    try:
+        file = open(file_name, 'r')
+    except:
+        print("No More Levels")
+        return False 
 
     lines = file.readlines()
 
