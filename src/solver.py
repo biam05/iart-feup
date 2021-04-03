@@ -34,4 +34,4 @@ def solver(level_no, advanced, algorithm):
             len(path), end_node.game_state.common_gs.goals, end_node.game_state.blocks,
             graph.expanded_nodes]
 
-print(solver(2, False, "bfs"))
+print(solver(15, True, "dfs"))

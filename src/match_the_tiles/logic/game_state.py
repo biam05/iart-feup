@@ -467,6 +467,6 @@ class GameState:
         self_blocks = sorted(self.blocks, key=lambda el: (el.coords.x, el.coords.y, el.color))
         other_blocks = sorted(other.blocks, key=lambda el: (el.coords.x, el.coords.y, el.color))
         return all(map(lambda x, y: x == y, self_blocks, other_blocks))
-
     def __hash__(self):
-        return hash(tuple(sorted(self.blocks, key=lambda el: (el.coords.x, el.coords.y, el.color))))
+       return hash(self.__str__())
+    
