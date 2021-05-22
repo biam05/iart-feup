@@ -1,3 +1,4 @@
+from proj2.src.matchthetiles.gamestate.gamestate import GameState
 import gym
 from gym import spaces
 
@@ -17,7 +18,7 @@ class MTT_4x4_1B(gym.Env):
         self.rows = 4
         self.cols = 4
         
-        self.game_state = None
+        self.game_state = self.reset()
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Discrete(perm(self.rows * self.cols, self.blocks, exact=True))
 
@@ -51,8 +52,15 @@ class MTT_4x4_1B(gym.Env):
             self.game_state.swipe_down()
     
     def reset(self):
-        # generate gamestate
-        return None
+        self.env_steps = 0
+
+        self.game_state = GameState.generate_game_state(self.blocks, self.walls, self.rows, self.cols)
+        self.render()
+        return self.game_state
+
+    def render(self, mode='human'):
+        if (mode == 'human'):
+            print(self.game_state)
 
     def __done(self):
         if self.env_steps > self.max_steps:

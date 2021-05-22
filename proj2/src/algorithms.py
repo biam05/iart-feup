@@ -1,7 +1,8 @@
 import numpy as np
 import gym
+import matchthetiles
 
-env = gym.make("match-the-tiles-env-0")
+env = gym.make("match-the-tiles-v0")
 
 observation_space = env.observation_space
 action_space = env.action_space
@@ -60,3 +61,7 @@ for ep in range(n_episodes):
     exploration_prob = max(min_exploration_prob, np.exp(-exploration_decay * ep))
     reward_per_episode.append(epsiode_reward)
 
+print("Reward per episodes")
+
+for i in range(10):
+    print(f"Mean reward on episode {i * 1000}-{(i+1)*1000 - 1} : {np.mean(reward_per_episode[i * 1000 : (i + 1) * 1000 - 1])}")
