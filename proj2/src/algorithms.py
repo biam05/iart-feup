@@ -8,7 +8,7 @@ observation_space = env.observation_space
 action_space = env.action_space
 
 # Q-Table
-q_table = np.zeros((observation_space, action_space))
+q_table = np.zeros((observation_space.n, action_space.n))
 
 # Number of episodes
 n_episodes = 10000
@@ -44,7 +44,7 @@ for ep in range(n_episodes):
 
         if np.random.uniform(0, 1) < exploration_prob:
             # Mutation
-            action = np.random.randint(0, action_space)
+            action = action_space.sample()
         else:
             action = np.argmax(q_table[current_state, :])
 

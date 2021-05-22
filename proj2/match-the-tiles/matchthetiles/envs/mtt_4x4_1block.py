@@ -1,4 +1,4 @@
-from proj2.src.matchthetiles.gamestate.gamestate import GameState
+from matchthetiles.gamestate.gamestate import GameState
 import gym
 from gym import spaces
 
@@ -12,6 +12,7 @@ class MTT_4x4_1B(gym.Env):
 
         # Environment variables
         self.env_steps = 0
+        self.max_steps = 100
 
         self.blocks = 1
         self.walls = 4
