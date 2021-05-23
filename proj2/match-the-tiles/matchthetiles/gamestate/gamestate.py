@@ -399,7 +399,6 @@ class GameState:
                     continue
                 queue.insert(0, edge)
 
-        print(f"Best score: {best_score}")
         return best_state
 
     def euclidean_distance(self, dist_func=min, node_func=min):

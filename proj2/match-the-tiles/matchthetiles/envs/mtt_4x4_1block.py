@@ -56,7 +56,6 @@ class MTT_4x4_1B(gym.Env):
         self.env_steps = 0
 
         self.game_state = GameState.generate_game_state(self.blocks, self.walls, self.rows, self.cols)
-        self.render()
         return self.game_state
 
     def render(self, mode='human'):

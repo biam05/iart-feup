@@ -2,13 +2,16 @@ import numpy as np
 import gym
 import matchthetiles
 
+from collections import defaultdict
+
 env = gym.make("match-the-tiles-v0")
 
 observation_space = env.observation_space
 action_space = env.action_space
 
 # Q-Table
-q_table = np.zeros((observation_space.n, action_space.n))
+q_table = defaultdict(lambda: [0] * action_space.n)
+#q_table = np.zeros((observation_space.n, action_space.n))
 
 # Number of episodes
 n_episodes = 10000
@@ -40,17 +43,19 @@ for ep in range(n_episodes):
 
     epsiode_reward = 0
 
+    print(f"Episode {ep}")
+
     for step in range(max_steps):
 
         if np.random.uniform(0, 1) < exploration_prob:
             # Mutation
             action = action_space.sample()
         else:
-            action = np.argmax(q_table[current_state, :])
+            action = np.argmax(q_table[current_state])
 
         next_state, reward, done, info = env.step(action)
 
-        q_table[current_state, action] = (1 - learn_rate) * q_table[current_state, action] + learn_rate * (reward + gamma * max(q_table[next_state, :]))
+        q_table[current_state][action] = (1 - learn_rate) * q_table[current_state][action] + learn_rate * (reward + gamma * max(q_table[next_state]))
 
         epsiode_reward += reward
 
@@ -64,4 +69,4 @@ for ep in range(n_episodes):
 print("Reward per episodes")
 
 for i in range(10):
-    print(f"Mean reward on episode {i * 1000}-{(i+1)*1000 - 1} : {np.mean(reward_per_episode[i * 1000 : (i + 1) * 1000 - 1])}")
+    print(f"\tMean reward on episode {i * 1000}-{(i+1)*1000 - 1} : {np.mean(reward_per_episode[i * 1000 : (i + 1) * 1000 - 1])}")
