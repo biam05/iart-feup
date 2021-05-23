@@ -43,8 +43,6 @@ for ep in range(n_episodes):
 
     epsiode_reward = 0
 
-    print(f"Episode {ep}")
-
     for step in range(max_steps):
 
         if np.random.uniform(0, 1) < exploration_prob:

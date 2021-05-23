@@ -8,7 +8,7 @@ class MTT_4x4_1B(gym.Env):
     def __init__(self):
         # Constants
         self.penalty_step = -1
-        self.reward_finish = 20
+        self.reward_finish = 200
 
         # Environment variables
         self.env_steps = 0
@@ -69,7 +69,7 @@ class MTT_4x4_1B(gym.Env):
         return self.game_state.is_game_over()
 
     def __reward(self):
-        if self.__done(): return self.reward_finish
+        if self.game_state.is_game_over(): return self.reward_finish
         return self.penalty_step * self.env_steps
 
 ACTIONS = {
