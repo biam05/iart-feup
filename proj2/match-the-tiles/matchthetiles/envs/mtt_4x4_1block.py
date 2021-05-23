@@ -67,10 +67,10 @@ class MTT_4x4_1B(gym.Env):
             return True
 
         return self.game_state.is_game_over()
-
+ 
     def __reward(self):
-        if self.game_state.is_game_over(): return self.reward_finish
-        return self.penalty_step * self.env_steps
+        if self.game_state.is_game_over(): return self.reward_finish - self.env_steps
+        return self.env_steps * self.penalty_step
 
 ACTIONS = {
     0: "SWIPE LEFT",
