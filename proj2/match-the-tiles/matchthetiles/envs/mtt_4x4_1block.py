@@ -1,3 +1,4 @@
+from copy import deepcopy
 from matchthetiles.gamestate.gamestate import GameState, CommonGameState
 import gym
 from gym import spaces
@@ -8,7 +9,7 @@ class MTT_4x4_1B(gym.Env):
     def __init__(self):
         # Constants
         self.penalty_step = -1
-        self.reward_finish = 0
+        self.reward_finish = 100
 
         # Environment variables
         self.env_steps = 0
@@ -24,7 +25,6 @@ class MTT_4x4_1B(gym.Env):
 
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Discrete(perm(self.rows * self.cols, self.blocks, exact=True))
-
         
 
     def step(self, action):
@@ -38,7 +38,7 @@ class MTT_4x4_1B(gym.Env):
 
         done = self.__done()
 
-        observation = self.game_state
+        observation = deepcopy(self.game_state)
 
         info = {
             "action_move": ACTIONS[action]
@@ -55,6 +55,7 @@ class MTT_4x4_1B(gym.Env):
             self.game_state.swipe_right()
         elif action == 3:
             self.game_state.swipe_down()
+
     
     def reset(self):
         self.env_steps = 0
@@ -64,7 +65,7 @@ class MTT_4x4_1B(gym.Env):
         walls = ((0, 1), (0, 3), (2, 0), (2, 1),)
         
         self.game_state = GameState(CommonGameState(walls, goals, self.rows, self.cols), blocks)
-        return self.game_state
+        return deepcopy(self.game_state)
 
     def render(self, mode='human'):
         if (mode == 'human'):
