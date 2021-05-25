@@ -287,6 +287,10 @@ class GameState:
             dists.append(d)
         return min(dists)
 
+    def make_copy(self):
+        blocks = deepcopy(self.blocks)
+        return GameState(self.common_gs, self.blocks_as_list(blocks))
+
     @staticmethod
     def generate_game_state(n_blocks, n_walls, rows, cols):
         walls = list()

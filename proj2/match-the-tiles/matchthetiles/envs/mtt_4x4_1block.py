@@ -1,4 +1,4 @@
-from matchthetiles.gamestate.gamestate import GameState
+from matchthetiles.gamestate.gamestate import GameState, CommonGameState
 import gym
 from gym import spaces
 
@@ -8,7 +8,7 @@ class MTT_4x4_1B(gym.Env):
     def __init__(self):
         # Constants
         self.penalty_step = -1
-        self.reward_finish = 200
+        self.reward_finish = 0
 
         # Environment variables
         self.env_steps = 0
@@ -19,9 +19,13 @@ class MTT_4x4_1B(gym.Env):
         self.rows = 4
         self.cols = 4
         
+
         self.game_state = self.reset()
+
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Discrete(perm(self.rows * self.cols, self.blocks, exact=True))
+
+        
 
     def step(self, action):
         assert action in ACTIONS
@@ -55,7 +59,11 @@ class MTT_4x4_1B(gym.Env):
     def reset(self):
         self.env_steps = 0
 
-        self.game_state = GameState.generate_game_state(self.blocks, self.walls, self.rows, self.cols)
+        blocks = ((2, 2, 'a'),)
+        goals = ((0, 0, 'A'),)
+        walls = ((0, 1), (0, 3), (2, 0), (2, 1),)
+        
+        self.game_state = GameState(CommonGameState(walls, goals, self.rows, self.cols), blocks)
         return self.game_state
 
     def render(self, mode='human'):
@@ -69,8 +77,8 @@ class MTT_4x4_1B(gym.Env):
         return self.game_state.is_game_over()
  
     def __reward(self):
-        if self.game_state.is_game_over(): return self.reward_finish - self.env_steps
-        return self.env_steps * self.penalty_step
+        if self.game_state.is_game_over(): return self.reward_finish
+        return self.penalty_step
 
 ACTIONS = {
     0: "SWIPE LEFT",

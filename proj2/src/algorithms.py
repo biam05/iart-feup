@@ -14,7 +14,7 @@ q_table = defaultdict(lambda: [0] * action_space.n)
 #q_table = np.zeros((observation_space.n, action_space.n))
 
 # Number of episodes
-n_episodes = 5000
+n_episodes = 100
 # Maximum number of steps per episode
 max_steps = 100
 
@@ -31,7 +31,7 @@ min_exploration_prob = 0.01
 gamma = 0.9
 
 # Learning rate
-learn_rate = 0.1
+learn_rate = 0.05
 
 # Q-learning
 reward_per_episode = list()
@@ -55,8 +55,8 @@ for ep in range(n_episodes):
 
         q_table[current_state][action] = q_table[current_state][action] + learn_rate * (reward + gamma * max(q_table[next_state]) - q_table[current_state][action])
 
-        print(f"Episode {ep} - Step {step} - Reward : {reward} - max {max(q_table[next_state])} - current {q_table[current_state][action]}")
-        epsiode_reward = reward
+        #print(f"Episode {ep} - Step {step} - Reward : {reward} - max {max(q_table[next_state])} - current {q_table[current_state][action]}")
+        epsiode_reward += reward
 
         if done: break
 
@@ -66,6 +66,5 @@ for ep in range(n_episodes):
     reward_per_episode.append(epsiode_reward)
 
 print("Reward per episodes")
-
 for i in range(10):
     print(f"\tMean reward on episode {i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1} : {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
