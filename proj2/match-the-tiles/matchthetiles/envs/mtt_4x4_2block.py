@@ -5,7 +5,7 @@ from gym import spaces
 
 from scipy.special import perm
 
-class MTT_4x4_1B(gym.Env):
+class MTT_4x4_2B(gym.Env):
     def __init__(self):
         # Constants
         self.penalty_step = -1
