@@ -69,10 +69,10 @@ def q_learn(env, n_episodes = 1000, max_steps = 100, exploration_prob = 1, min_e
     print("Q-table")
     print(q_table, end="\n\n")
 
-    print("Reward per episodes")
+    print("Mean rewards per episodes")
     for i in range(10):
-        print(f"\tMean reward on episode {i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1} : {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
-
+        print(f"{i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1}, {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
+        
 def sarsa(env, n_episodes = 1000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
     print("SARSA")
     print(f"Exploration probability - {exploration_prob}")
@@ -141,9 +141,9 @@ def sarsa(env, n_episodes = 1000, max_steps = 100, exploration_prob = 1, min_exp
     print("Q-table")
     print(q_table, end="\n\n")
 
-    print("Reward per episodes")
+    print("Mean rewards per episodes")
     for i in range(10):
-        print(f"\tMean reward on episode {i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1} : {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
+        print(f"{i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1}, {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
 
 
 def run_algorithm(env_id):
