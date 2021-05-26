@@ -10,3 +10,8 @@ register(
     id="match-the-tiles-v1",
     entry_point="matchthetiles.envs.mtt_4x4_2block:MTT_4x4_2B"
 )
+
+register(
+    id="match-the-tiles-v2",
+    entry_point="matchthetiles.envs.mtt_4x4_2block_hard:MTT_4x4_2B_Hard"
+)

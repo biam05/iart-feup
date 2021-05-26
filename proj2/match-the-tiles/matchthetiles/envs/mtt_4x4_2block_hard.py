@@ -5,7 +5,7 @@ from gym import spaces
 
 from scipy.special import perm
 
-class MTT_4x4_1B(gym.Env):
+class MTT_4x4_2B_Hard(gym.Env):
     def __init__(self):
         # Constants
         self.penalty_step = -1
@@ -15,8 +15,8 @@ class MTT_4x4_1B(gym.Env):
         self.env_steps = 0
         self.max_steps = 100
 
-        self.blocks = 1
-        self.walls = 4
+        self.blocks = 2
+        self.walls = 3
         self.rows = 4
         self.cols = 4
         
@@ -59,10 +59,9 @@ class MTT_4x4_1B(gym.Env):
     
     def reset(self):
         self.env_steps = 0
-
-        blocks = ((2, 2, 'a'),)
-        goals = ((0, 0, 'A'),)
-        walls = ((0, 1), (0, 3), (2, 0), (2, 1),)
+        blocks = ((0, 2, 'p'), (1, 1, 'o'),)
+        goals = ((1, 2, 'O'), (3, 3, 'P'),)
+        walls = ((0, 3), (2, 3), (2, 2),)
         
         self.game_state = GameState(CommonGameState(walls, goals, self.rows, self.cols), blocks)
         return deepcopy(self.game_state)

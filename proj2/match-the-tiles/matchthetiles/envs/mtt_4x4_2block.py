@@ -9,7 +9,7 @@ class MTT_4x4_2B(gym.Env):
     def __init__(self):
         # Constants
         self.penalty_step = -1
-        self.reward_finish = 100
+        self.reward_finish = 0
 
         # Environment variables
         self.env_steps = 0

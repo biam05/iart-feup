@@ -1,1 +1,1 @@
-from matchthetiles.envs import mtt_4x4_1block, mtt_4x4_2block
+from matchthetiles.envs import mtt_4x4_1block, mtt_4x4_2block, mtt_4x4_2block_hard
