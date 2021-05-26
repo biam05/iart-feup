@@ -7,7 +7,7 @@ import sys
 
 from collections import defaultdict
 
-def q_learn(env, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
+def q_learn(env, variation=None, n_episodes = 100, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
     print("Q_LEARN")
     print(f"Exploration probability - {exploration_prob}")
     print(f"Exploration decay - {exploration_decay}")
@@ -69,11 +69,19 @@ def q_learn(env, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_
     print("Q-table")
     print(q_table, end="\n\n")
 
+    if (variation):
+        csv_file = open(f"statistics/q-learn/{variation}.csv", "w+")
+        csv_file.write('Episode,Reward\n')
+        for e, r in enumerate(reward_per_episode):
+            csv_file.write(f"{e},{r}\n")
+
+        csv_file.close()
+
     print("Mean rewards per episodes")
     for i in range(10):
         print(f"{i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1}, {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
         
-def sarsa(env, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
+def sarsa(env, variation=None, n_episodes = 100, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
     print("SARSA")
     print(f"Exploration probability - {exploration_prob}")
     print(f"Exploration decay - {exploration_decay}")
@@ -141,6 +149,14 @@ def sarsa(env, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_ex
     print("Q-table")
     print(q_table, end="\n\n")
 
+    if (variation):
+        csv_file = open(f"statistics/sarsa/{variation}.csv", "w+")
+        csv_file.write('Episode,Reward\n')
+        for e, r in enumerate(reward_per_episode):
+            csv_file.write(f"{e},{r}\n")
+        
+        csv_file.close()
+
     print("Mean rewards per episodes")
     for i in range(10):
         print(f"{i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1}, {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
@@ -148,26 +164,31 @@ def sarsa(env, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_ex
 
 def run_algorithm(env_id):
     env = gym.make(env_id)
-    sys.stdout = open("statistics/algorithms_" + env_id + ".txt", "w+")
+    file = open("statistics/algorithms_" + env_id + ".txt", "w+")
+    sys.stdout = file
 
     # Q_LEARN
-    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.1)
+    q_learn(env, variation=env_id+"-default", exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.1)
 
-    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.3)
-    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.05)
+    q_learn(env, variation=env_id+"-high_LR", exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.6)
+    q_learn(env, variation=env_id+"-low_LR", exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.01)
 
-    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=1.0, learn_rate=0.1)
-    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.6, learn_rate=0.1)
+    q_learn(env, variation=env_id+"-max_gamma", exploration_prob=1, exploration_decay=0.001, gamma=1.0, learn_rate=0.1)
+    q_learn(env, variation=env_id+"-low_gamma", exploration_prob=1, exploration_decay=0.001, gamma=0.4, learn_rate=0.1)
 
-    q_learn(env, exploration_prob=1, exploration_decay=0.006, gamma=0.9, learn_rate=0.1)
+    q_learn(env, variation=env_id+"-high_expl_decay", exploration_prob=1, exploration_decay=0.006, gamma=0.9, learn_rate=0.1)
 
     # SARSA
-    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.1)
+    sarsa(env, variation=env_id+"-default", exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.1)
 
-    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.3)
-    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.05)
+    sarsa(env, variation=env_id+"-high_LR", exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.6)
+    sarsa(env, variation=env_id+"-low_LR", exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.01)
 
-    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=1.0, learn_rate=0.1)
-    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.6, learn_rate=0.1)
+    sarsa(env, variation=env_id+"-max_gamma", exploration_prob=1, exploration_decay=0.001, gamma=1.0, learn_rate=0.1)
+    sarsa(env, variation=env_id+"-low_gamma", exploration_prob=1, exploration_decay=0.001, gamma=0.4, learn_rate=0.1)
 
-    sarsa(env, exploration_prob=1, exploration_decay=0.006, gamma=0.9, learn_rate=0.1)
+    sarsa(env, variation=env_id+"-high_expl_decay", exploration_prob=1, exploration_decay=0.006, gamma=0.9, learn_rate=0.1)
+
+    sys.stdout = sys.__stdout__
+    file.close()
+    print("Finished " + env_id)
