@@ -3,88 +3,171 @@ import gym
 import matchthetiles
 
 from copy import deepcopy
+import sys
 
 from collections import defaultdict
 
-env = gym.make("match-the-tiles-v0")
+def q_learn(env, n_episodes = 1000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
+    print("Q_LEARN")
+    print(f"Exploration probability - {exploration_prob}")
+    print(f"Exploration decay - {exploration_decay}")
+    print(f"Gamma - {gamma}")
+    print(f"Learn Rate - {learn_rate}")
+    observation_space = env.observation_space
+    action_space = env.action_space
+    # Q-Table
+    #q_table = defaultdict(lambda: [0] * action_space.n)
+    q_table = np.zeros((observation_space.n, action_space.n))
 
-observation_space = env.observation_space
-action_space = env.action_space
+    states_explored = 0
+    states_ids = dict()
 
-# Q-Table
-#q_table = defaultdict(lambda: [0] * action_space.n)
-q_table = np.zeros((observation_space.n, action_space.n))
+    # Q-learning
+    reward_per_episode = list()
 
-states_explored = 0
-states_ids = dict()
+    for ep in range(n_episodes):
+        current_state = env.reset()
 
-# Number of episodes
-n_episodes = 1000
-# Maximum number of steps per episode
-max_steps = 100
+        done = False
 
-# Exploration probability
-exploration_prob = 1
+        epsiode_reward = 0
 
-# Exploration decay for exponential decreasing
-exploration_decay = 0.001
+        for step in range(max_steps):
 
-# Minimum exploration probability
-min_exploration_prob = 0.01
+            state_id = states_ids.get(current_state, states_explored)
 
-# Discount factor
-gamma = 0.9
+            if (current_state not in states_ids):
+                states_ids[current_state] = states_explored
+                states_explored += 1
 
-# Learning rate
-learn_rate = 0.1
+            if np.random.uniform(0, 1) < exploration_prob:
+                # Mutation
+                action = action_space.sample()
+            else:
+                action = np.argmax(q_table[state_id, :])
 
-# Q-learning
-reward_per_episode = list()
+            next_state, reward, done, info = env.step(action)
 
-for ep in range(n_episodes):
-    current_state = env.reset()
+            new_state_id = states_ids.get(next_state, states_explored)
 
-    done = False
+            if (next_state not in states_ids):
+                states_ids[next_state] = states_explored
+                states_explored += 1
 
-    epsiode_reward = 0
+            q_table[state_id, action] = q_table[state_id, action] + learn_rate * (reward + gamma * max(q_table[new_state_id, :]) - q_table[state_id, action])
 
-    for step in range(max_steps):
+            #print(f"Episode {ep} - Step {step} - Reward : {reward} - max {max(q_table[next_state])} - current {q_table[current_state][action]}")
+            epsiode_reward += reward
 
-        state_id = states_ids.get(current_state, states_explored)
+            if done: break
 
-        if (current_state not in states_ids):
-            states_ids[current_state] = states_explored
-            states_explored += 1
+            current_state = deepcopy(next_state)
 
-        if np.random.uniform(0, 1) < exploration_prob:
-            # Mutation
-            action = action_space.sample()
-        else:
-            action = np.argmax(q_table[state_id, :])
+        exploration_prob = max(min_exploration_prob, np.exp(-exploration_decay * ep))
+        reward_per_episode.append(epsiode_reward)
 
-        next_state, reward, done, info = env.step(action)
+    print("Q-table")
+    print(q_table, end="\n\n")
 
-        new_state_id = states_ids.get(next_state, states_explored)
+    print("Reward per episodes")
+    for i in range(10):
+        print(f"\tMean reward on episode {i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1} : {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
 
-        if (next_state not in states_ids):
-            states_ids[next_state] = states_explored
-            states_explored += 1
+def sarsa(env, n_episodes = 1000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
+    print("SARSA")
+    print(f"Exploration probability - {exploration_prob}")
+    print(f"Exploration decay - {exploration_decay}")
+    print(f"Gamma - {gamma}")
+    print(f"Learn Rate - {learn_rate}")
+    observation_space = env.observation_space
+    action_space = env.action_space
+    # Q-Table
+    #q_table = defaultdict(lambda: [0] * action_space.n)
+    q_table = np.zeros((observation_space.n, action_space.n))
 
-        q_table[state_id, action] = q_table[state_id, action] + learn_rate * (reward + gamma * max(q_table[new_state_id, :]) - q_table[state_id, action])
+    states_explored = 0
+    states_ids = dict()
 
-        #print(f"Episode {ep} - Step {step} - Reward : {reward} - max {max(q_table[next_state])} - current {q_table[current_state][action]}")
-        epsiode_reward += reward
+    # Q-learning
+    reward_per_episode = list()
 
-        if done: break
+    for ep in range(n_episodes):
+        current_state = env.reset()
 
-        current_state = deepcopy(next_state)
+        done = False
 
-    exploration_prob = max(min_exploration_prob, np.exp(-exploration_decay * ep))
-    reward_per_episode.append(epsiode_reward)
+        epsiode_reward = 0
 
-print("Q-table")
-print(q_table, end="\n\n")
+        for step in range(max_steps):
 
-print("Reward per episodes")
-for i in range(10):
-    print(f"\tMean reward on episode {i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1} : {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
+            state_id = states_ids.get(current_state, states_explored)
+
+            if (current_state not in states_ids):
+                states_ids[current_state] = states_explored
+                states_explored += 1
+
+            if np.random.uniform(0, 1) < exploration_prob:
+                # Mutation
+                action = action_space.sample()
+            else:
+                action = np.argmax(q_table[state_id, :])
+
+            next_state, reward, done, info = env.step(action)
+
+            new_state_id = states_ids.get(next_state, states_explored)
+
+            if (next_state not in states_ids):
+                states_ids[next_state] = states_explored
+                states_explored += 1
+
+            if np.random.uniform(0, 1) < exploration_prob:
+                # Mutation
+                next_action = action_space.sample()
+            else:
+                next_action = np.argmax(q_table[new_state_id, :])
+
+            q_table[state_id, action] = q_table[state_id, action] + learn_rate * (reward + gamma * q_table[new_state_id, next_action] - q_table[state_id, action])
+
+            #print(f"Episode {ep} - Step {step} - Reward : {reward} - max {max(q_table[next_state])} - current {q_table[current_state][action]}")
+            epsiode_reward += reward
+
+            if done: break
+
+            current_state = deepcopy(next_state)
+
+        exploration_prob = max(min_exploration_prob, np.exp(-exploration_decay * ep))
+        reward_per_episode.append(epsiode_reward)
+
+    print("Q-table")
+    print(q_table, end="\n\n")
+
+    print("Reward per episodes")
+    for i in range(10):
+        print(f"\tMean reward on episode {i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1} : {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
+
+
+def run_algorithm(env_id):
+    env = gym.make(env_id)
+    sys.stdout = open("statistics/algorithms_" + env_id + ".txt", "w+")
+
+    # Q_LEARN
+    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.1)
+
+    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.3)
+    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.05)
+
+    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=1.0, learn_rate=0.1)
+    q_learn(env, exploration_prob=1, exploration_decay=0.001, gamma=0.6, learn_rate=0.1)
+
+    q_learn(env, exploration_prob=1, exploration_decay=0.006, gamma=0.9, learn_rate=0.1)
+
+    # SARSA
+    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.1)
+
+    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.3)
+    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.9, learn_rate=0.05)
+
+    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=1.0, learn_rate=0.1)
+    sarsa(env, exploration_prob=1, exploration_decay=0.001, gamma=0.6, learn_rate=0.1)
+
+    sarsa(env, exploration_prob=1, exploration_decay=0.006, gamma=0.9, learn_rate=0.1)
