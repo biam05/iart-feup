@@ -7,7 +7,7 @@ import sys
 
 from collections import defaultdict
 
-def q_learn(env, variation=None, n_episodes = 100, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
+def q_learn(env, variation=None, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
     print("Q_LEARN")
     print(f"Exploration probability - {exploration_prob}")
     print(f"Exploration decay - {exploration_decay}")
@@ -72,8 +72,8 @@ def q_learn(env, variation=None, n_episodes = 100, max_steps = 100, exploration_
     if (variation):
         csv_file = open(f"statistics/q-learn/{variation}.csv", "w+")
         csv_file.write('Episode,Reward\n')
-        for e, r in enumerate(reward_per_episode):
-            csv_file.write(f"{e},{r}\n")
+        for i in range(100):
+            csv_file.write(f"{i * n_episodes // 100}-{(i+1)*n_episodes // 100 - 1},{np.mean(reward_per_episode[i * n_episodes // 100 : (i + 1) * n_episodes // 100 - 1])}\n")
 
         csv_file.close()
 
@@ -81,7 +81,7 @@ def q_learn(env, variation=None, n_episodes = 100, max_steps = 100, exploration_
     for i in range(10):
         print(f"{i * n_episodes // 10}-{(i+1)*n_episodes // 10 - 1}, {np.mean(reward_per_episode[i * n_episodes // 10 : (i + 1) * n_episodes // 10 - 1])}")
         
-def sarsa(env, variation=None, n_episodes = 100, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
+def sarsa(env, variation=None, n_episodes = 10000, max_steps = 100, exploration_prob = 1, min_exploration_prob = 0.01, exploration_decay = 0.001, gamma = 0.9, learn_rate = 0.1):
     print("SARSA")
     print(f"Exploration probability - {exploration_prob}")
     print(f"Exploration decay - {exploration_decay}")
@@ -152,8 +152,8 @@ def sarsa(env, variation=None, n_episodes = 100, max_steps = 100, exploration_pr
     if (variation):
         csv_file = open(f"statistics/sarsa/{variation}.csv", "w+")
         csv_file.write('Episode,Reward\n')
-        for e, r in enumerate(reward_per_episode):
-            csv_file.write(f"{e},{r}\n")
+        for i in range(100):
+            csv_file.write(f"{i * n_episodes // 100}-{(i+1)*n_episodes // 100 - 1},{np.mean(reward_per_episode[i * n_episodes // 100 : (i + 1) * n_episodes // 100 - 1])}\n")
         
         csv_file.close()
 
