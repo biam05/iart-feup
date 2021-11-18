@@ -1,4 +1,4 @@
-from utils.utils import Coords
+from matchthetiles.utils.coords import Coords
 
 class BlockData:
     """
